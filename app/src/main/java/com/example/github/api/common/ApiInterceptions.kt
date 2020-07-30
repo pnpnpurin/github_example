@@ -10,14 +10,24 @@ object ApiInterceptions {
         return try {
             chain.proceed(chain.request())
         } catch (e: Exception) {
-            throw ApiException.wrapIfDefined(e)
+            throw ApiException.wrapIfFatal(e)
         }
+    }
+
+    fun interceptClientException(chain: Interceptor.Chain): Response {
+        val response = chain.proceed(chain.request())
+        when (response.code) {
+            BadRequestException.code -> BadRequestException()
+            UnprocessableEntityException.code -> UnprocessableEntityException()
+            else -> null
+        }?.let { throw it }
+        return response
     }
 
     fun interceptServerException(chain: Interceptor.Chain): Response {
         val response = chain.proceed(chain.request())
         if (!response.isSuccessful) {
-            val exception = when (response.code) {
+            when (response.code) {
                 401, 403 -> ApiServerException(
                     code = response.code,
                     message = response.message,
@@ -32,8 +42,7 @@ object ApiInterceptions {
                     code = response.code,
                     message = response.message
                 )
-            }
-            throw exception
+            }.let { throw it }
         }
         return response
     }

@@ -1,10 +1,12 @@
 package com.example.github.repository
 
+import com.example.github.entity.common.Result
 import com.example.github.entity.common.succeeded
 import com.example.github.repository.search.user.ApiUserRepository
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.flow.collect
 import kotlinx.coroutines.runBlocking
+import kotlinx.serialization.MissingFieldException
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.MediaType.Companion.toMediaType
@@ -13,25 +15,42 @@ import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Test
+import org.junit.Rule
 import retrofit2.Retrofit
 
 class ApiUserRepositoryTest {
+    @get:Rule
+    val server = MockWebServer()
 
     @Test
     fun `when user search api request successfully then it should user entity is set to Result#Success`() = runBlocking {
-        val server = MockWebServer()
         server.enqueue(MockResponse().setBody(responseJson))
-        server.start()
-
         val baseUrl = server.url("")
         val repository = ApiUserRepository(retrofit(baseUrl.toString()))
 
         repository.search("abced", 1, 100)
             .collect {
                 assertThat(it.succeeded).isTrue()
+                val result = it as Result.Success
+                assertThat(result.data.totalCount).isEqualTo(12)
+                assertThat(result.data.entities.firstOrNull()?.login).isEqualTo("mojombo")
             }
+    }
 
-        server.shutdown()
+    @Test
+    fun `when received invalid json then it should serialization exception is set to Result#Error`() = runBlocking {
+        val response = MockResponse()
+        server.enqueue(response.setBody(invalidJson))
+
+        val baseUrl = server.url("")
+        val repository = ApiUserRepository(retrofit(baseUrl.toString()))
+
+        repository.search("abced", 1, 100)
+            .collect {
+                assertThat(it.succeeded).isFalse()
+                val result = it as Result.Error
+                assertThat(result.exception).isInstanceOf(MissingFieldException::class.java)
+            }
     }
 
     private fun retrofit(baseUrl: String): Retrofit {
@@ -73,6 +92,12 @@ class ApiUserRepositoryTest {
               "score": 1
             }
           ]
+        }
+        """.trimIndent()
+
+    private val invalidJson = """
+        {
+          "hoge": "hogeeeeeeeee"
         }
         """.trimIndent()
 }

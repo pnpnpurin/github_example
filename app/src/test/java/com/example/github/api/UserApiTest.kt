@@ -1,5 +1,8 @@
 package com.example.github.api
 
+import com.example.github.api.common.ApiInterceptions
+import com.example.github.api.common.BadRequestException
+import com.example.github.api.common.UnprocessableEntityException
 import com.example.github.api.search.user.UserApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.runBlocking
@@ -10,35 +13,80 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.Assert.assertThrows
+import org.junit.Rule
 import org.junit.Test
+import org.junit.rules.ExpectedException
 import retrofit2.Retrofit
 
 class UserApiTest {
+    @get:Rule
+    val server = MockWebServer()
+
+    @Rule
+    @JvmField
+    var thrown: ExpectedException = ExpectedException.none()
 
     @Test
-    fun `when user search api request successfully then it should emit json parsing and request parameters should be set correctly`() = runBlocking {
-        val server = MockWebServer()
+    fun `when user search api request successfully then it should emit json parsing and request parameters should be set correctly`() {
         server.enqueue(MockResponse().setBody(responseJson))
-        server.start()
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
         val api = retrofit.create(UserApi::class.java)
 
-        val response = api.search("abcdef", 1, 100)
+        val response = runBlocking {
+            api.search("abcdef", 1, 100)
+        }
         assertThat(response.totalCount).isEqualTo(12)
         assertThat(response.items.first().login).isEqualTo("mojombo")
 
         val request = server.takeRequest()
         assertThat(request.path).isEqualTo("/search/users?q=abcdef&page=1&per_page=100")
         assertThat(request.method).isEqualTo("GET")
+    }
 
-        server.shutdown()
+    @Test
+    fun `when send invalid json will result it should emit throw bad request exception`() {
+        val mockresponse = MockResponse()
+        mockresponse.setResponseCode(400)
+        server.enqueue(mockresponse.setBody(badrequestJson))
+
+        val baseUrl = server.url("")
+        val retrofit = retrofit(baseUrl.toString())
+        val api = retrofit.create(UserApi::class.java)
+
+        assertThrows(BadRequestException::class.java) {
+            runBlocking {
+                api.search("abcdef")
+            }
+        }
+    }
+
+    @Test
+    fun `when send invalid fields will result it should emit throw unprocessable entity exception`() {
+        val mockresponse = MockResponse()
+        mockresponse.setResponseCode(422)
+        server.enqueue(mockresponse.setBody(unprocessableJson))
+
+        val baseUrl = server.url("")
+        val retrofit = retrofit(baseUrl.toString())
+        val api = retrofit.create(UserApi::class.java)
+
+        assertThrows(UnprocessableEntityException::class.java) {
+            runBlocking {
+                api.search("abcdef")
+            }
+        }
     }
 
     private fun retrofit(baseUrl: String): Retrofit {
         val contentType = "application/json".toMediaType()
-        val client = OkHttpClient.Builder().build()
+        val client = OkHttpClient.Builder()
+            .apply {
+                addInterceptor(ApiInterceptions::interceptClientException)
+            }
+            .build()
         return Retrofit.Builder()
             .baseUrl(baseUrl)
             .client(client)
@@ -75,6 +123,26 @@ class UserApiTest {
               "score": 1
             }
           ]
+        }
+        """.trimIndent()
+
+    private val badrequestJson = """
+        {
+          "message":"Problems parsing JSON"
+        }
+    """.trimIndent()
+
+    private val unprocessableJson = """
+        {
+          "message": "Validation Failed",
+          "errors": [
+            {
+              "resource": "Search",
+              "field": "q",
+              "code": "missing"
+            }
+          ],
+          "documentation_url": "https://developer.github.com/v3/search"
         }
         """.trimIndent()
 }

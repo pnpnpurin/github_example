@@ -9,7 +9,7 @@ abstract class ApiException(
 ) : AppException(message, cause) {
 
     companion object {
-        fun wrapIfDefined(exception: Throwable): Throwable {
+        fun wrapIfFatal(exception: Throwable): Throwable {
             return when (exception) {
                 // Add custom error handling here
                 is IOException, is RuntimeException -> ApiNetworkingException(exception)

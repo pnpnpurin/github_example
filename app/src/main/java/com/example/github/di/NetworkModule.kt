@@ -31,6 +31,7 @@ object NetworkModule {
 
                     addInterceptor(ApiInterceptions::interceptAdditionalHeader)
                     addInterceptor(ApiInterceptions::interceptNetworkingException)
+                    addInterceptor(ApiInterceptions::interceptClientException)
                     addInterceptor(ApiInterceptions::interceptServerException)
                 }
                 .build()

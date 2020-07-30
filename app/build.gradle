@@ -70,7 +70,7 @@ dependencies {
 
     implementation 'com.orhanobut:logger:2.2.0'
 
-    testImplementation 'junit:junit:4.12'
+    testImplementation 'junit:junit:4.13'
     testImplementation 'org.assertj:assertj-core:3.16.1'
     testImplementation "com.squareup.okhttp3:mockwebserver:$okhttp_version"
 }
