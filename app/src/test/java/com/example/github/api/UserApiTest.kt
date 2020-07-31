@@ -1,8 +1,6 @@
 package com.example.github.api
 
-import com.example.github.api.common.ApiInterceptions
-import com.example.github.api.common.BadRequestException
-import com.example.github.api.common.UnprocessableEntityException
+import com.example.github.api.common.*
 import com.example.github.api.search.user.UserApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.runBlocking
@@ -18,6 +16,7 @@ import org.junit.Rule
 import org.junit.Test
 import org.junit.rules.ExpectedException
 import retrofit2.Retrofit
+import java.util.concurrent.TimeUnit
 
 class UserApiTest {
     @get:Rule
@@ -80,11 +79,29 @@ class UserApiTest {
         }
     }
 
+    @Test
+    fun `when server response time out it should emit throw api server exception`() {
+        val baseUrl = server.url("")
+        val retrofit = retrofit(baseUrl.toString())
+        val api = retrofit.create(UserApi::class.java)
+
+        assertThrows(ApiNetworkingException::class.java) {
+            runBlocking {
+                api.search("abcdef")
+            }
+        }
+
+        server.shutdown()
+    }
+
     private fun retrofit(baseUrl: String): Retrofit {
         val contentType = "application/json".toMediaType()
         val client = OkHttpClient.Builder()
             .apply {
+                connectTimeout(1, TimeUnit.SECONDS)
+                readTimeout(1, TimeUnit.SECONDS)
                 addInterceptor(ApiInterceptions::interceptClientException)
+                addInterceptor(ApiInterceptions::interceptNetworkingException)
             }
             .build()
         return Retrofit.Builder()

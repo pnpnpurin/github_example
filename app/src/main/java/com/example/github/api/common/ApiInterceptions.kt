@@ -1,7 +1,6 @@
 package com.example.github.api.common
 
 import com.example.github.BuildConfig
-import com.example.github.entity.common.AppException
 import okhttp3.Interceptor
 import okhttp3.Response
 
@@ -31,12 +30,12 @@ object ApiInterceptions {
                 401, 403 -> ApiServerException(
                     code = response.code,
                     message = response.message,
-                    type = AppException.AppExceptionType.UNAUTHORIZED
+                    type = ApiException.ApiExceptionType.UNAUTHORIZED
                 )
                 404 -> ApiServerException(
                     code = response.code,
                     message = response.message,
-                    type = AppException.AppExceptionType.NOT_FOUND
+                    type = ApiException.ApiExceptionType.NOT_FOUND
                 )
                 else -> ApiServerException(
                     code = response.code,

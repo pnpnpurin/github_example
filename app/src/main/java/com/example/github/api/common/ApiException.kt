@@ -1,12 +1,21 @@
 package com.example.github.api.common
 
-import com.example.github.entity.common.AppException
 import java.io.IOException
 
 abstract class ApiException(
     message: String? = null,
     cause: Throwable? = null
-) : AppException(message, cause) {
+) : IOException(message, cause) {
+
+    abstract val type: ApiExceptionType
+
+    enum class ApiExceptionType {
+        NETWORKING_ERROR,
+        SERVER_ERROR,
+        UNAUTHORIZED,
+        NOT_FOUND,
+        UNKNOWN;
+    }
 
     companion object {
         fun wrapIfFatal(exception: Throwable): Throwable {
@@ -16,6 +25,9 @@ abstract class ApiException(
                 else -> exception
             }
         }
+
+        fun of(throwable: Throwable): ApiException =
+            throwable as? ApiException ?: UnknownException(throwable)
     }
 }
 
@@ -23,23 +35,30 @@ abstract class ApiException(
 class ApiNetworkingException(
     cause: Throwable
 ) : ApiException(cause.toString(), cause) {
-    override val type: AppExceptionType = AppExceptionType.NETWORKING_ERROR
+    override val type: ApiExceptionType = ApiExceptionType.NETWORKING_ERROR
 }
 
 // Data processing error caused by client
 class ApiApplicationException(
     cause: Throwable
 ) : ApiException(cause.toString(), cause) {
-    override val type: AppExceptionType = AppExceptionType.NETWORKING_ERROR
+    override val type: ApiExceptionType = ApiExceptionType.NETWORKING_ERROR
 }
 
 // Error due to HTTP status code caused by server
 class ApiServerException(
     val code: Int,
     message: String?,
-    override val type: AppExceptionType = AppExceptionType.SERVER_ERROR
+    override val type: ApiExceptionType = ApiExceptionType.SERVER_ERROR
 ) : ApiException("$code: $message")
 
 class UnauthorizedException : ApiException() {
-    override val type: AppExceptionType = AppExceptionType.UNAUTHORIZED
+    override val type: ApiExceptionType = ApiExceptionType.UNAUTHORIZED
+}
+
+// Unknown error
+class UnknownException(
+    cause: Throwable
+) : ApiException(cause = cause) {
+    override val type: ApiExceptionType = ApiExceptionType.UNKNOWN
 }
