@@ -46,6 +46,22 @@ class UserApiTest {
     }
 
     @Test
+    fun `when user search api request successfully then it should user agent is correctly set in the request header`() {
+        server.enqueue(MockResponse().setBody(responseJson))
+
+        val baseUrl = server.url("")
+        val retrofit = retrofit(baseUrl.toString())
+        val api = retrofit.create(UserApi::class.java)
+
+        runBlocking {
+            api.search("abcdef")
+        }
+
+        val request = server.takeRequest()
+        assertThat(request.headers["User-Agent"]).contains("example")
+    }
+
+    @Test
     fun `when send invalid json will result it should emit throw bad request exception`() {
         val mockresponse = MockResponse()
         mockresponse.setResponseCode(400)
@@ -80,6 +96,66 @@ class UserApiTest {
     }
 
     @Test
+    fun `when server responsed with 404 it should emit throw api server exception and then exception type must be NOT_FOUND`() {
+        val mockresponse = MockResponse()
+        mockresponse.setResponseCode(404)
+        server.enqueue(mockresponse.setBody(""))
+
+        val baseUrl = server.url("")
+        val retrofit = retrofit(baseUrl.toString())
+        val api = retrofit.create(UserApi::class.java)
+
+        runBlocking {
+            try {
+                api.search("abcdef")
+            } catch (e: Exception) {
+                assertThat(e).isInstanceOf(ApiServerException::class.java)
+                assertThat((e as ApiServerException).type).isEqualTo(ApiException.ApiExceptionType.NOT_FOUND)
+            }
+        }
+    }
+
+    @Test
+    fun `when server responsed with 401 it should emit throw api server exception and then exception type must be UNAUTHORIZED`() {
+        val mockresponse = MockResponse()
+        mockresponse.setResponseCode(401)
+        server.enqueue(mockresponse.setBody(""))
+
+        val baseUrl = server.url("")
+        val retrofit = retrofit(baseUrl.toString())
+        val api = retrofit.create(UserApi::class.java)
+
+        runBlocking {
+            try {
+                api.search("abcdef")
+            } catch (e: Exception) {
+                assertThat(e).isInstanceOf(ApiServerException::class.java)
+                assertThat((e as ApiServerException).type).isEqualTo(ApiException.ApiExceptionType.UNAUTHORIZED)
+            }
+        }
+    }
+
+    @Test
+    fun `when server responsed with 50x it should emit throw api server exception and then status code must set same`() {
+        val mockresponse = MockResponse()
+        mockresponse.setResponseCode(500)
+        server.enqueue(mockresponse.setBody(""))
+
+        val baseUrl = server.url("")
+        val retrofit = retrofit(baseUrl.toString())
+        val api = retrofit.create(UserApi::class.java)
+
+        runBlocking {
+            try {
+                api.search("abcdef")
+            } catch (e: Exception) {
+                assertThat(e).isInstanceOf(ApiServerException::class.java)
+                assertThat((e as ApiServerException).code).isEqualTo(500)
+            }
+        }
+    }
+
+    @Test
     fun `when server response time out it should emit throw api server exception`() {
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
@@ -100,8 +176,10 @@ class UserApiTest {
             .apply {
                 connectTimeout(1, TimeUnit.SECONDS)
                 readTimeout(1, TimeUnit.SECONDS)
+                addInterceptor(ApiInterceptions::interceptServerException)
                 addInterceptor(ApiInterceptions::interceptClientException)
                 addInterceptor(ApiInterceptions::interceptNetworkingException)
+                addInterceptor(ApiInterceptions::interceptAdditionalHeader)
             }
             .build()
         return Retrofit.Builder()

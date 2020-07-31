@@ -30,8 +30,8 @@ object NetworkModule {
                     readTimeout(TIMEOUT_INTERVAL_SECOND, TimeUnit.SECONDS)
 
                     addInterceptor(ApiInterceptions::interceptAdditionalHeader)
-                    addInterceptor(ApiInterceptions::interceptClientException)
                     addInterceptor(ApiInterceptions::interceptServerException)
+                    addInterceptor(ApiInterceptions::interceptClientException)
                     addInterceptor(ApiInterceptions::interceptNetworkingException)
                 }
                 .build()
