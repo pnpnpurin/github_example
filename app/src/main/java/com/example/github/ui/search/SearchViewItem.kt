@@ -11,7 +11,7 @@ sealed class SearchViewItem {
     ) : SearchViewItem() {
         val login: String
             get() = user.login
-        val imageUrl: String
+        val imageUrl: String?
             get() = user.imageUrl
 
         override val viewType: SearchViewType = SearchViewType.UserSearchRow
