@@ -1,7 +1,9 @@
 package com.example.github.ui.search.user
 
 import android.os.Bundle
+import android.view.Menu
 import androidx.appcompat.app.AppCompatActivity
+import androidx.appcompat.widget.SearchView
 import androidx.databinding.DataBindingUtil
 import androidx.recyclerview.widget.DividerItemDecoration
 import androidx.recyclerview.widget.LinearLayoutManager
@@ -27,6 +29,31 @@ class UserSearchActivity : AppCompatActivity() {
         bindViewModelEvents()
     }
 
+    override fun onCreateOptionsMenu(menu: Menu?): Boolean {
+        super.onCreateOptionsMenu(menu)
+        menuInflater.inflate(R.menu.search, menu)
+
+        val searchMenu = menu?.findItem(R.id.search_menu)
+        (searchMenu?.actionView as? SearchView)?.also {
+            it.queryHint = getString(R.string.search)
+            it.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+                override fun onQueryTextSubmit(query: String?): Boolean {
+                    if (!query.isNullOrEmpty()) {
+                        viewModel.setQuery(query)
+                        it.clearFocus()
+                    }
+                    return true
+                }
+
+                override fun onQueryTextChange(newText: String?): Boolean {
+                    return true
+                }
+            })
+        }
+
+        return true
+    }
+
     private fun initView() {
         val itemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
         adapter = UserSearchAdapter(this)
@@ -45,17 +72,19 @@ class UserSearchActivity : AppCompatActivity() {
 
     private fun bindViewModelEvents() {
         bind(viewModel.data) {
-            adapter.updateUserList(it)
+            adapter.updateUserList(it, false)
         }
         bind(viewModel.error) {
             it?.printStackTrace()
         }
         bind(viewModel.loading) {
-            if (it) Logger.w("loading...")
+            if (it) {
+                adapter.updateUserList(listOf(), true)
+                Logger.w("loading...")
+            }
         }
         bind(viewModel.query) {
             if (!it.isNullOrEmpty()) viewModel.search()
         }
-        viewModel.setQuery("abc")
     }
 }

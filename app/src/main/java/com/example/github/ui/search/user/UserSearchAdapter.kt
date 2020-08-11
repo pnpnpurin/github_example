@@ -13,7 +13,7 @@ class UserSearchAdapter(
     private val context: Context
 ) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
 
-    private var users: List<SearchViewItem.UserSearchRowItem> = listOf()
+    private var users = listOf<SearchViewItem>()
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return SearchViewType.of(viewType).createViewHolder(LayoutInflater.from(context), parent, false)
@@ -22,8 +22,11 @@ class UserSearchAdapter(
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
         when (holder) {
             is SearchViewHolder.UserSearchRowViewHolder -> {
-                val item = users[position]
+                val item = users[position] as SearchViewItem.UserSearchRowItem
                 holder.bind(item)
+            }
+            is SearchViewHolder.LoadingViewHolder -> {
+                // nop
             }
         }
     }
@@ -34,8 +37,14 @@ class UserSearchAdapter(
         return users[position].viewType.id
     }
 
-    fun updateUserList(userList: List<User>) {
-        users = userList.map { SearchViewItem.UserSearchRowItem(it) }
+    fun updateUserList(userList: List<User>, isLoading: Boolean) {
+        users = mutableListOf<SearchViewItem>().also { list ->
+            list.addAll(userList.map { SearchViewItem.UserSearchRowItem(it) })
+            if (isLoading) {
+                list.add(SearchViewItem.LoadingItem)
+            }
+        }
+
         notifyDataSetChanged()
     }
 }

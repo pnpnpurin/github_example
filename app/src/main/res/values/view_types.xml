@@ -1,4 +1,6 @@
 <?xml version="1.0" encoding="utf-8"?>
 <resources>
     <item name="view_type_user_search_row" type="id" />
+
+    <item name="view_type_list_loading_row" type="id" />
 </resources>
