@@ -4,8 +4,7 @@ import androidx.lifecycle.ViewModel
 import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import com.example.github.entity.User
-import com.example.github.repository.search.user.UserRepository
-import com.orhanobut.logger.Logger
+import com.example.github.repository.search.user.SearchUsersRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -17,7 +16,7 @@ import kotlinx.coroutines.launch
 @FlowPreview
 @ExperimentalCoroutinesApi
 class UserSearchViewModel(
-    private val repository: UserRepository
+    private val repository: SearchUsersRepository
 ) : ViewModel() {
 
     private val _load = BroadcastChannel<Unit>(Channel.BUFFERED)
@@ -31,7 +30,7 @@ class UserSearchViewModel(
 
     init {
         load.map { _query.value }
-            .flatMapConcat { repository.search(it) }
+            .flatMapConcat { repository.fetch(it) }
             .flowOn(Dispatchers.IO)
             .onEach { response.value = it }
             .launchIn(viewModelScope)

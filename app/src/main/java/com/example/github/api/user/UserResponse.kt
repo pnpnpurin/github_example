@@ -1,4 +1,4 @@
-package com.example.github.api.search.user
+package com.example.github.api.user
 
 import kotlinx.serialization.SerialName
 import kotlinx.serialization.Serializable

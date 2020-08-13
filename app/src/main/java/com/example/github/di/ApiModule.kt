@@ -1,13 +1,13 @@
 package com.example.github.di
 
-import com.example.github.repository.search.user.ApiUserRepository
-import com.example.github.repository.search.user.UserRepository
+import com.example.github.repository.search.user.ApiSearchUsersRepository
+import com.example.github.repository.search.user.SearchUsersRepository
 import org.koin.dsl.module
 
 object ApiModule {
     fun module() = module {
-        single<UserRepository> {
-            ApiUserRepository(get())
+        single<SearchUsersRepository> {
+            ApiSearchUsersRepository(get())
         }
     }
 }

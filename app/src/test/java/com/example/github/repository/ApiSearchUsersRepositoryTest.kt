@@ -2,7 +2,7 @@ package com.example.github.repository
 
 import androidx.paging.PagingData
 import androidx.paging.map
-import com.example.github.repository.search.user.ApiUserRepository
+import com.example.github.repository.search.user.ApiSearchUsersRepository
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.flow.first
 import kotlinx.coroutines.test.runBlockingTest
@@ -17,7 +17,7 @@ import org.junit.Test
 import org.junit.Rule
 import retrofit2.Retrofit
 
-class ApiUserRepositoryTest {
+class ApiSearchUsersRepositoryTest {
     @get:Rule
     val server = MockWebServer()
 
@@ -25,9 +25,9 @@ class ApiUserRepositoryTest {
     fun `when user search api request successfully then it should user entity is set to PagingData`() = runBlockingTest {
         server.enqueue(MockResponse().setBody(responseJson))
         val baseUrl = server.url("")
-        val repository = ApiUserRepository(retrofit(baseUrl.toString()))
+        val repository = ApiSearchUsersRepository(retrofit(baseUrl.toString()))
 
-        val result = repository.search("abced").first()
+        val result = repository.fetch("abced").first()
         assertThat(result).isInstanceOf(PagingData::class.java)
         result.map { user ->
             assertThat(user.login).isEqualTo("mojombo")

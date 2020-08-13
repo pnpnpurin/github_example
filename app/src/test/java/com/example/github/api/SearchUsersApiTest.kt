@@ -1,7 +1,7 @@
 package com.example.github.api
 
 import com.example.github.api.common.*
-import com.example.github.api.search.user.UserApi
+import com.example.github.api.search.user.SearchUsersApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
@@ -14,17 +14,12 @@ import org.assertj.core.api.Assertions.assertThat
 import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
-import org.junit.rules.ExpectedException
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
-class UserApiTest {
+class SearchUsersApiTest {
     @get:Rule
     val server = MockWebServer()
-
-    @Rule
-    @JvmField
-    var thrown: ExpectedException = ExpectedException.none()
 
     @Test
     fun `when user search api request successfully then it should emit json parsing and request parameters should be set correctly`() {
@@ -32,7 +27,7 @@ class UserApiTest {
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         val response = runBlocking {
             api.search("abcdef", 1, 100)
@@ -51,7 +46,7 @@ class UserApiTest {
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         runBlocking {
             api.search("abcdef")
@@ -69,7 +64,7 @@ class UserApiTest {
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         assertThrows(BadRequestException::class.java) {
             runBlocking {
@@ -86,7 +81,7 @@ class UserApiTest {
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         assertThrows(UnprocessableEntityException::class.java) {
             runBlocking {
@@ -103,7 +98,7 @@ class UserApiTest {
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         runBlocking {
             try {
@@ -123,7 +118,7 @@ class UserApiTest {
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         runBlocking {
             try {
@@ -143,7 +138,7 @@ class UserApiTest {
 
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         runBlocking {
             try {
@@ -159,7 +154,7 @@ class UserApiTest {
     fun `when server response time out it should emit throw api server exception`() {
         val baseUrl = server.url("")
         val retrofit = retrofit(baseUrl.toString())
-        val api = retrofit.create(UserApi::class.java)
+        val api = retrofit.create(SearchUsersApi::class.java)
 
         assertThrows(ApiNetworkingException::class.java) {
             runBlocking {

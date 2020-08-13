@@ -3,12 +3,12 @@ package com.example.github.paging
 import androidx.paging.PagingSource
 import com.example.github.api.common.ApiConfig
 import com.example.github.api.common.NoResultException
-import com.example.github.api.search.user.UserApi
-import com.example.github.api.search.user.UserResponse
+import com.example.github.api.search.user.SearchUsersApi
+import com.example.github.api.user.UserResponse
 import com.example.github.entity.User
 
 class UserPagingSource(
-    private val api: UserApi,
+    private val api: SearchUsersApi,
     private val query: String
 ) : PagingSource<Int, User>() {
 
