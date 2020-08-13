@@ -1,4 +1,8 @@
 <resources>
     <string name="app_name">GitHub</string>
-    <string name="search">検索</string>
+
+    <string name="search">Search</string>
+
+    <string name="no_results_message">Not found results.</string>
+    <string name="load_failed_message">Failed to loading.\nTap here to reload.</string>
 </resources>

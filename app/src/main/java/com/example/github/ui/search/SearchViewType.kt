@@ -3,7 +3,6 @@ package com.example.github.ui.search
 import androidx.annotation.IdRes
 import com.example.github.R
 import com.example.github.ui.ViewType
-import com.example.github.ui.search.SearchViewHolder.LoadingViewHolder
 import com.example.github.ui.search.SearchViewHolder.UserSearchRowViewHolder
 import kotlin.reflect.KFunction
 
@@ -23,10 +22,5 @@ sealed class SearchViewType(
     object UserSearchRow : SearchViewType(
         R.id.view_type_user_search_row,
         ::UserSearchRowViewHolder
-    )
-
-    object LoadingRow : SearchViewType(
-        R.id.view_type_list_loading_row,
-        ::LoadingViewHolder
     )
 }

@@ -16,8 +16,4 @@ sealed class SearchViewItem {
 
         override val viewType: SearchViewType = SearchViewType.UserSearchRow
     }
-
-    object LoadingItem : SearchViewItem() {
-        override val viewType: SearchViewType = SearchViewType.LoadingRow
-    }
 }

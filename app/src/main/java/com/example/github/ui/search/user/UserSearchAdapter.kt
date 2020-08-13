@@ -3,48 +3,45 @@ package com.example.github.ui.search.user
 import android.content.Context
 import android.view.LayoutInflater
 import android.view.ViewGroup
+import androidx.paging.PagingDataAdapter
+import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.github.entity.User
 import com.example.github.ui.search.SearchViewHolder
 import com.example.github.ui.search.SearchViewItem
 import com.example.github.ui.search.SearchViewType
+import java.lang.IllegalStateException
 
 class UserSearchAdapter(
     private val context: Context
-) : RecyclerView.Adapter<RecyclerView.ViewHolder>() {
-
-    private var users = listOf<SearchViewItem>()
+) : PagingDataAdapter<User, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return SearchViewType.of(viewType).createViewHolder(LayoutInflater.from(context), parent, false)
     }
 
     override fun onBindViewHolder(holder: RecyclerView.ViewHolder, position: Int) {
+        val user = getItem(position) ?: throw IllegalStateException("user must not be null")
         when (holder) {
             is SearchViewHolder.UserSearchRowViewHolder -> {
-                val item = users[position] as SearchViewItem.UserSearchRowItem
-                holder.bind(item)
-            }
-            is SearchViewHolder.LoadingViewHolder -> {
-                // nop
+                holder.bind(SearchViewItem.UserSearchRowItem(user))
             }
         }
     }
-
-    override fun getItemCount(): Int = users.size
 
     override fun getItemViewType(position: Int): Int {
-        return users[position].viewType.id
+        return SearchViewType.UserSearchRow.id
     }
 
-    fun updateUserList(userList: List<User>, isLoading: Boolean) {
-        users = mutableListOf<SearchViewItem>().also { list ->
-            list.addAll(userList.map { SearchViewItem.UserSearchRowItem(it) })
-            if (isLoading) {
-                list.add(SearchViewItem.LoadingItem)
+    companion object {
+        val DIFF_CALLBACK = object : DiffUtil.ItemCallback<User>() {
+            override fun areItemsTheSame(oldItem: User, newItem: User): Boolean {
+                return oldItem.login == newItem.login
+            }
+
+            override fun areContentsTheSame(oldItem: User, newItem: User): Boolean {
+                return oldItem == newItem
             }
         }
-
-        notifyDataSetChanged()
     }
 }

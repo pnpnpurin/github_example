@@ -14,6 +14,7 @@ abstract class ApiException(
         SERVER_ERROR,
         UNAUTHORIZED,
         NOT_FOUND,
+        NO_RESULT,
         UNKNOWN;
     }
 
@@ -55,6 +56,10 @@ class ApiServerException(
 class UnauthorizedException : ApiException() {
     override val type: ApiExceptionType = ApiExceptionType.UNAUTHORIZED
 }
+
+class NoResultException(
+    override val type: ApiExceptionType = ApiExceptionType.NO_RESULT
+) : ApiException()
 
 // Unknown error
 class UnknownException(
