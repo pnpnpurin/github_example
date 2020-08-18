@@ -14,7 +14,6 @@ import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.github.R
 import com.example.github.api.common.NoResultException
 import com.example.github.databinding.ActivityUserSearchBinding
-import com.example.github.ui.bind
 import com.example.github.ui.search.SearchLoadStateAdapter
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -112,11 +111,14 @@ class UserSearchActivity : AppCompatActivity() {
     }
 
     private fun bindViewModelEvents() {
-        viewModel.data
-            .onEach { adapter.submitData(it) }
-            .launchIn(lifecycleScope)
-        bind(viewModel.query) {
-            if (!it.isNullOrEmpty()) viewModel.search()
+        lifecycleScope.launch {
+            viewModel.query
+                .filter { it.isNotEmpty() }
+                .collectLatest { query ->
+                    viewModel.search(query).collectLatest { result ->
+                        adapter.submitData(result)
+                    }
+                }
         }
     }
 
