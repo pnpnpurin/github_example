@@ -1,12 +1,17 @@
-package com.example.github.repository
+package com.example.github.viewmodel
 
+import androidx.lifecycle.viewModelScope
 import androidx.paging.PagingData
 import androidx.paging.map
+import com.example.github.TestCoroutineRule
 import com.example.github.repository.search.user.ApiSearchUsersRepository
+import com.example.github.ui.search.user.UserSearchViewModel
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
 import kotlinx.coroutines.ExperimentalCoroutinesApi
+import kotlinx.coroutines.flow.filter
 import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.test.runBlockingTest
+import kotlinx.coroutines.flow.launchIn
+import kotlinx.coroutines.flow.onEach
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
 import okhttp3.MediaType.Companion.toMediaType
@@ -14,26 +19,46 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
-import org.junit.Test
 import org.junit.Rule
+import org.junit.Test
 import retrofit2.Retrofit
 
 @ExperimentalCoroutinesApi
-class ApiSearchUsersRepositoryTest {
+class UserSearchViewModelTest {
     @get:Rule
     val server = MockWebServer()
 
+    @get:Rule
+    val testCoroutineRule = TestCoroutineRule()
+
     @Test
-    fun `when user search api request successfully then it should user entity is set to PagingData`() = runBlockingTest {
+    fun `when search call successfully then it should  user entity is set to PagingData`() {
         server.enqueue(MockResponse().setBody(responseJson))
         val baseUrl = server.url("")
         val repository = ApiSearchUsersRepository(retrofit(baseUrl.toString()))
 
-        val result = repository.fetch("abced").first()
-        assertThat(result).isInstanceOf(PagingData::class.java)
-        result.map { user ->
-            assertThat(user.login).isEqualTo("mojombo")
+        val viewmodel = UserSearchViewModel(repository)
+        testCoroutineRule.runBlockingTest {
+            val result = viewmodel.search("abcde").first()
+            assertThat(result).isInstanceOf(PagingData::class.java)
+            result.map { assertThat(it.login).isEqualTo("mojombo") }
         }
+    }
+
+    @Test
+    fun `when call setQuery after subscribe query then it should can get query parameter`() {
+        server.enqueue(MockResponse().setBody(responseJson))
+        val baseUrl = server.url("")
+        val repository = ApiSearchUsersRepository(retrofit(baseUrl.toString()))
+        val viewmodel = UserSearchViewModel(repository)
+
+        viewmodel.query
+            .filter { it.isNotEmpty() }
+            .onEach {
+                assertThat(it).isEqualTo("abcde")
+            }
+            .launchIn(viewmodel.viewModelScope)
+        viewmodel.setQuery("abcde")
     }
 
     private fun retrofit(baseUrl: String): Retrofit {
@@ -75,12 +100,6 @@ class ApiSearchUsersRepositoryTest {
               "score": 1
             }
           ]
-        }
-        """.trimIndent()
-
-    private val invalidJson = """
-        {
-          "hoge": "hogeeeeeeeee"
         }
         """.trimIndent()
 }

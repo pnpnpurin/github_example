@@ -6,7 +6,6 @@ import androidx.paging.PagingData
 import androidx.paging.cachedIn
 import com.example.github.entity.User
 import com.example.github.repository.search.user.SearchUsersRepository
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.channels.ConflatedBroadcastChannel
@@ -25,7 +24,6 @@ class UserSearchViewModel(
     fun search(query: String): Flow<PagingData<User>> {
         return repository.fetch(query)
             .cachedIn(viewModelScope)
-            .flowOn(Dispatchers.IO)
     }
 
     fun setQuery(query: String) {

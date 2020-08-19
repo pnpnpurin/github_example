@@ -3,6 +3,7 @@ package com.example.github.api
 import com.example.github.api.common.*
 import com.example.github.api.search.user.SearchUsersApi
 import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.runBlocking
 import kotlinx.serialization.json.Json
 import kotlinx.serialization.json.JsonConfiguration
@@ -17,6 +18,7 @@ import org.junit.Test
 import retrofit2.Retrofit
 import java.util.concurrent.TimeUnit
 
+@ExperimentalCoroutinesApi
 class SearchUsersApiTest {
     @get:Rule
     val server = MockWebServer()
