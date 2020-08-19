@@ -7,14 +7,24 @@ import androidx.paging.PagingDataAdapter
 import androidx.recyclerview.widget.DiffUtil
 import androidx.recyclerview.widget.RecyclerView
 import com.example.github.entity.User
+import com.example.github.ui.search.SearchPresenter
 import com.example.github.ui.search.SearchViewHolder
 import com.example.github.ui.search.SearchViewItem
 import com.example.github.ui.search.SearchViewType
 import java.lang.IllegalStateException
 
 class UserSearchAdapter(
-    private val context: Context
+    private val context: Context,
+    private val tapItemCallback: (User) -> Unit
 ) : PagingDataAdapter<User, RecyclerView.ViewHolder>(DIFF_CALLBACK) {
+
+    private val presenter = object : SearchPresenter {
+        override fun onTapItem(position: Int) {
+            getItem(position)?.let {
+                tapItemCallback.invoke(it)
+            }
+        }
+    }
 
     override fun onCreateViewHolder(parent: ViewGroup, viewType: Int): RecyclerView.ViewHolder {
         return SearchViewType.of(viewType).createViewHolder(LayoutInflater.from(context), parent, false)
@@ -24,7 +34,7 @@ class UserSearchAdapter(
         val user = getItem(position) ?: throw IllegalStateException("user must not be null")
         when (holder) {
             is SearchViewHolder.UserSearchRowViewHolder -> {
-                holder.bind(SearchViewItem.UserSearchRowItem(user))
+                holder.bind(SearchViewItem.UserSearchRowItem(user), position, presenter)
             }
         }
     }

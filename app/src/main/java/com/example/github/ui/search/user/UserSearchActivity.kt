@@ -15,6 +15,7 @@ import com.example.github.R
 import com.example.github.api.common.NoResultException
 import com.example.github.databinding.ActivityUserSearchBinding
 import com.example.github.ui.search.SearchLoadStateAdapter
+import com.example.github.ui.user.UserActivity
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
@@ -67,7 +68,10 @@ class UserSearchActivity : AppCompatActivity() {
 
     private fun initView() {
         val itemDecoration = DividerItemDecoration(this, DividerItemDecoration.VERTICAL)
-        adapter = UserSearchAdapter(this)
+        adapter = UserSearchAdapter(this) {
+            val intent = UserActivity.createIntent(this, it.login)
+            startActivity(intent)
+        }
 
         binding.recyclerView.also {
             it.layoutManager = LinearLayoutManager(this)
