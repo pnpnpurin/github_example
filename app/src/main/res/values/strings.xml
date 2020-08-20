@@ -5,4 +5,7 @@
 
     <string name="no_results_message">Not found results.</string>
     <string name="load_failed_message">Failed to loading.\nTap here to reload.</string>
+
+    <string name="followers_label">%1$,d Followers</string>
+    <string name="following_label">%1$,d Following</string>
 </resources>

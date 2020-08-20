@@ -31,6 +31,6 @@ class UserPagingSource(
     }
 
     private fun UserResponse.toEntity(): User {
-        return User(id, login, imageUrl)
+        return User(id, login, imageUrl, bio, blog, followers, following)
     }
 }

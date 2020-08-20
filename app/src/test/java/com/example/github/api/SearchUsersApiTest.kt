@@ -12,6 +12,7 @@ import okhttp3.OkHttpClient
 import okhttp3.mockwebserver.MockResponse
 import okhttp3.mockwebserver.MockWebServer
 import org.assertj.core.api.Assertions.assertThat
+import org.junit.After
 import org.junit.Assert.assertThrows
 import org.junit.Rule
 import org.junit.Test
@@ -22,6 +23,11 @@ import java.util.concurrent.TimeUnit
 class SearchUsersApiTest {
     @get:Rule
     val server = MockWebServer()
+
+    @After
+    fun tearDown() {
+        server.shutdown()
+    }
 
     @Test
     fun `when user search api request successfully then it should emit json parsing and request parameters should be set correctly`() {
@@ -163,8 +169,6 @@ class SearchUsersApiTest {
                 api.search("abcdef")
             }
         }
-
-        server.shutdown()
     }
 
     private fun retrofit(baseUrl: String): Retrofit {
