@@ -193,11 +193,14 @@ class SearchUsersApiTest {
                         isLenient = true,
                         serializeSpecialFloatingPointValues = true,
                         useArrayPolymorphism = true
-                    )).asConverterFactory(contentType))
+                    )
+                ).asConverterFactory(contentType)
+            )
             .build()
     }
 
-    private val responseJson = """
+    private val responseJson =
+        """
         {
           "total_count": 12,
           "incomplete_results": false,
@@ -222,13 +225,15 @@ class SearchUsersApiTest {
         }
         """.trimIndent()
 
-    private val badrequestJson = """
+    private val badrequestJson =
+        """
         {
           "message":"Problems parsing JSON"
         }
-    """.trimIndent()
+        """.trimIndent()
 
-    private val unprocessableJson = """
+    private val unprocessableJson =
+        """
         {
           "message": "Validation Failed",
           "errors": [

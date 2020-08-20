@@ -74,11 +74,14 @@ class UserSearchViewModelTest {
                         isLenient = true,
                         serializeSpecialFloatingPointValues = true,
                         useArrayPolymorphism = true
-                    )).asConverterFactory(contentType))
+                    )
+                ).asConverterFactory(contentType)
+            )
             .build()
     }
 
-    private val responseJson = """
+    private val responseJson =
+        """
         {
           "total_count": 12,
           "incomplete_results": false,

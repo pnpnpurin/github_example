@@ -156,11 +156,14 @@ class UserApiTest {
                         isLenient = true,
                         serializeSpecialFloatingPointValues = true,
                         useArrayPolymorphism = true
-                    )).asConverterFactory(contentType))
+                    )
+                ).asConverterFactory(contentType)
+            )
             .build()
     }
 
-    private val responseJson = """
+    private val responseJson =
+        """
         {
           "login": "octocat",
           "id": 1,
@@ -195,12 +198,13 @@ class UserApiTest {
           "created_at": "2008-01-14T04:33:35Z",
           "updated_at": "2008-01-14T04:33:35Z"
         }
-        """
+        """.trimIndent()
 
-    private val notFoundJson = """
+    private val notFoundJson =
+        """
         {
           "message": "Not Found",
           "documentation_url": "https://docs.github.com/rest/reference/users#get-a-user"
         }
-    """.trimIndent()
+        """.trimIndent()
 }

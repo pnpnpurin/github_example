@@ -1,0 +1,30 @@
+// Before coding, change Android Studio settings as follows.
+// https://github.com/pinterest/ktlint#option-3
+//
+// See also .editorconfig file.
+//
+repositories {
+    jcenter()
+}
+
+configurations {
+    ktlint
+}
+
+dependencies {
+    ktlint "com.pinterest:ktlint:0.37.2"
+}
+
+task ktlint(type: JavaExec, group: "verification") {
+    description = "Check Kotlin code style."
+    classpath = configurations.ktlint
+    main = "com.pinterest.ktlint.Main"
+    args "src/**/*.kt",
+            "!src/**/*Test.kt",
+            "--android",
+            "--color",
+            "--reporter=plain",
+            "--reporter=checkstyle,output=${buildDir}/reports/ktlint-results.xml"
+    ignoreExitValue true
+}
+check.dependsOn ktlint

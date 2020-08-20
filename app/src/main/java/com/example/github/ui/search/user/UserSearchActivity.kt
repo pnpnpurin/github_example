@@ -48,7 +48,7 @@ class UserSearchActivity : AppCompatActivity() {
         val searchMenu = menu?.findItem(R.id.search_menu)
         (searchMenu?.actionView as? SearchView)?.also {
             it.queryHint = getString(R.string.search)
-            it.setOnQueryTextListener(object : SearchView.OnQueryTextListener{
+            it.setOnQueryTextListener(object : SearchView.OnQueryTextListener {
                 override fun onQueryTextSubmit(query: String?): Boolean {
                     if (!query.isNullOrEmpty()) {
                         viewModel.setQuery(query)

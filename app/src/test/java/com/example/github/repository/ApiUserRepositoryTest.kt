@@ -69,11 +69,14 @@ class ApiUserRepositoryTest {
                         isLenient = true,
                         serializeSpecialFloatingPointValues = true,
                         useArrayPolymorphism = true
-                    )).asConverterFactory(contentType))
+                    )
+                ).asConverterFactory(contentType)
+            )
             .build()
     }
 
-    private val responseJson = """
+    private val responseJson =
+        """
         {
           "login": "octocat",
           "id": 1,
@@ -110,7 +113,8 @@ class ApiUserRepositoryTest {
         }
         """
 
-    private val invalidJson = """
+    private val invalidJson =
+        """
         {
           "hoge": "hogeeeeeeeee"
         }

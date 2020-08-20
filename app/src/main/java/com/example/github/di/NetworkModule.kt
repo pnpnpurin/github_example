@@ -22,9 +22,11 @@ object NetworkModule {
             OkHttpClient.Builder()
                 .apply {
                     if (BuildConfig.DEBUG) {
-                        addInterceptor(HttpLoggingInterceptor().apply {
-                            level = HttpLoggingInterceptor.Level.BODY
-                        })
+                        addInterceptor(
+                            HttpLoggingInterceptor().apply {
+                                level = HttpLoggingInterceptor.Level.BODY
+                            }
+                        )
                     }
                     connectTimeout(TIMEOUT_INTERVAL_SECOND, TimeUnit.SECONDS)
                     readTimeout(TIMEOUT_INTERVAL_SECOND, TimeUnit.SECONDS)
