@@ -21,7 +21,7 @@ jobs:
 
       # Using caches
       - name: Gradle Cache
-      - uses: actions/cache@v1
+        uses: actions/cache@v1
         with:
           path: ~/.gradle/caches
           key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
