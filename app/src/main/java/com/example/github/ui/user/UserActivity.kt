@@ -4,12 +4,13 @@ import android.content.Context
 import android.content.Intent
 import android.os.Bundle
 import android.view.MenuItem
+import android.view.View
+import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
 import com.example.github.R
 import com.example.github.databinding.ActivityUserBinding
 import com.example.github.ui.bind
-import com.orhanobut.logger.Logger
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.androidx.viewmodel.ext.android.viewModel
@@ -54,13 +55,20 @@ class UserActivity : AppCompatActivity() {
 
     private fun bindViewModelEvents() {
         bind(viewModel.data) {
+            binding.progress.visibility = View.GONE
             binding.user = it
         }
         bind(viewModel.error) {
-            it?.printStackTrace()
+            binding.progress.visibility = View.GONE
+            it?.let { exception ->
+                Toast.makeText(this, exception.message, Toast.LENGTH_SHORT).show()
+                exception.printStackTrace()
+            }
         }
         bind(viewModel.loading) {
-            if (it) Logger.w("loading...")
+            if (it) {
+                binding.progress.visibility = View.VISIBLE
+            }
         }
         bind(viewModel.username) {
             if (!it.isNullOrEmpty()) viewModel.fetch()

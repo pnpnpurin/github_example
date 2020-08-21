@@ -30,6 +30,7 @@
             app:layout_constraintTop_toTopOf="parent"
             app:layout_constraintStart_toStartOf="parent"
             app:glide_imageUri="@{item.imageUrl}"
+            app:glide_placeholder="@{@drawable/ico_placeholder}"
             />
 
         <TextView

@@ -16,7 +16,6 @@ import com.example.github.api.common.NoResultException
 import com.example.github.databinding.ActivityUserSearchBinding
 import com.example.github.ui.search.SearchLoadStateAdapter
 import com.example.github.ui.user.UserActivity
-import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import kotlinx.coroutines.flow.*
@@ -116,7 +115,7 @@ class UserSearchActivity : AppCompatActivity() {
     }
 
     private fun bindViewModelEvents() {
-        lifecycleScope.launch(Dispatchers.IO) {
+        lifecycleScope.launch {
             viewModel.query
                 .filter { it.isNotEmpty() }
                 .collectLatest { query ->
