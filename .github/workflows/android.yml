@@ -19,13 +19,14 @@ jobs:
         with:
           java-version: 1.8
 
-      # Gradle Cache
+      # Using caches
+      - name: Gradle Cache
       - uses: actions/cache@v1
-          with:
-            path: ~/.gradle/caches
-            key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
-            restore-keys: |
-              ${{ runner.os }}-gradle-
+        with:
+          path: ~/.gradle/caches
+          key: ${{ runner.os }}-gradle-${{ hashFiles('**/*.gradle') }}
+          restore-keys: |
+            ${{ runner.os }}-gradle-
 
   build:
     needs: setup
