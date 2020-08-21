@@ -1,5 +1,7 @@
 # GitHub search Android app example
 
+![](https://github.com/pnpnpurin/github_example/workflows/Android%20CI/badge.svg)
+
 ### Libraries
 - Android Jetpack
   - Data Binding
