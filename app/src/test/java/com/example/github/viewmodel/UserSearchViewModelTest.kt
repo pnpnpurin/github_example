@@ -1,108 +1,58 @@
 package com.example.github.viewmodel
 
-import androidx.lifecycle.viewModelScope
-import androidx.paging.PagingData
-import androidx.paging.map
+import androidx.paging.*
 import com.example.github.TestCoroutineRule
+import com.example.github.paging.UserPagingSource
 import com.example.github.repository.search.user.ApiSearchUsersRepository
 import com.example.github.ui.search.user.UserSearchViewModel
-import com.jakewharton.retrofit2.converter.kotlinx.serialization.asConverterFactory
+import com.nhaarman.mockitokotlin2.doReturn
+import com.nhaarman.mockitokotlin2.mock
 import kotlinx.coroutines.ExperimentalCoroutinesApi
-import kotlinx.coroutines.flow.filter
-import kotlinx.coroutines.flow.first
-import kotlinx.coroutines.flow.launchIn
-import kotlinx.coroutines.flow.onEach
-import kotlinx.serialization.json.Json
-import kotlinx.serialization.json.JsonConfiguration
-import okhttp3.MediaType.Companion.toMediaType
-import okhttp3.OkHttpClient
-import okhttp3.mockwebserver.MockResponse
-import okhttp3.mockwebserver.MockWebServer
+import kotlinx.coroutines.FlowPreview
+import kotlinx.coroutines.flow.*
+import kotlinx.coroutines.launch
 import org.assertj.core.api.Assertions.assertThat
 import org.junit.Rule
 import org.junit.Test
-import retrofit2.Retrofit
 
+@FlowPreview
 @ExperimentalCoroutinesApi
 class UserSearchViewModelTest {
-    @get:Rule
-    val server = MockWebServer()
-
     @get:Rule
     val testCoroutineRule = TestCoroutineRule()
 
     @Test
-    fun `when search call successfully then it should  user entity is set to PagingData`() {
-        server.enqueue(MockResponse().setBody(responseJson))
-        val baseUrl = server.url("")
-        val repository = ApiSearchUsersRepository(retrofit(baseUrl.toString()))
+    fun `when search call successfully then it should user entity is set to PagingData`() {
+        val source = mock<UserPagingSource>()
+        val repository = mock<ApiSearchUsersRepository> {
+            on { fetch("abcde") } doReturn Pager(
+                config = PagingConfig(pageSize = 1, enablePlaceholders = false),
+                pagingSourceFactory = { source }
+            ).flow
+        }
 
         val viewmodel = UserSearchViewModel(repository)
         testCoroutineRule.runBlockingTest {
             val result = viewmodel.search("abcde").first()
             assertThat(result).isInstanceOf(PagingData::class.java)
-            result.map { assertThat(it.login).isEqualTo("mojombo") }
         }
     }
 
     @Test
     fun `when call setQuery after subscribe query then it should can get query parameter`() {
-        server.enqueue(MockResponse().setBody(responseJson))
-        val baseUrl = server.url("")
-        val repository = ApiSearchUsersRepository(retrofit(baseUrl.toString()))
+        val repository = mock<ApiSearchUsersRepository>()
         val viewmodel = UserSearchViewModel(repository)
 
-        viewmodel.query
-            .filter { it.isNotEmpty() }
-            .onEach {
-                assertThat(it).isEqualTo("abcde")
+        testCoroutineRule.runBlockingTest {
+            viewmodel.setQuery("abcde")
+            val job = launch {
+                viewmodel.query
+                    .filter { it.isNotEmpty() }
+                    .collect {
+                        assertThat(it).isEqualTo("abcde")
+                    }
             }
-            .launchIn(viewmodel.viewModelScope)
-        viewmodel.setQuery("abcde")
-    }
-
-    private fun retrofit(baseUrl: String): Retrofit {
-        val contentType = "application/json".toMediaType()
-        val client = OkHttpClient.Builder().build()
-        return Retrofit.Builder()
-            .baseUrl(baseUrl)
-            .client(client)
-            .addConverterFactory(
-                Json(
-                    JsonConfiguration.Stable.copy(
-                        ignoreUnknownKeys = true,
-                        isLenient = true,
-                        serializeSpecialFloatingPointValues = true,
-                        useArrayPolymorphism = true
-                    )
-                ).asConverterFactory(contentType)
-            )
-            .build()
-    }
-
-    private val responseJson =
-        """
-        {
-          "total_count": 12,
-          "incomplete_results": false,
-          "items": [
-            {
-              "login": "mojombo",
-              "id": 1,
-              "node_id": "MDQ6VXNlcjE=",
-              "avatar_url": "https://secure.gravatar.com/avatar/25c7c18223fb42a4c6ae1c8db6f50f9b?d=https://a248.e.akamai.net/assets.github.com%2Fimages%2Fgravatars%2Fgravatar-user-420.png",
-              "gravatar_id": "",
-              "url": "https://api.github.com/users/mojombo",
-              "html_url": "https://github.com/mojombo",
-              "followers_url": "https://api.github.com/users/mojombo/followers",
-              "subscriptions_url": "https://api.github.com/users/mojombo/subscriptions",
-              "organizations_url": "https://api.github.com/users/mojombo/orgs",
-              "repos_url": "https://api.github.com/users/mojombo/repos",
-              "received_events_url": "https://api.github.com/users/mojombo/received_events",
-              "type": "User",
-              "score": 1
-            }
-          ]
+            job.cancel()
         }
-        """.trimIndent()
+    }
 }
