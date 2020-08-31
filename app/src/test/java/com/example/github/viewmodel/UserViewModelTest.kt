@@ -1,6 +1,7 @@
 package com.example.github.viewmodel
 
 import com.example.github.TestCoroutineRule
+import com.example.github.entity.Repo
 import com.example.github.entity.User
 import com.example.github.entity.common.Result
 import com.example.github.repository.user.ApiUserRepository
@@ -40,21 +41,23 @@ class UserViewModelTest {
     fun `when fetch call successfully then it should user entity is set to Result#Success`() = testCoroutineRule.runBlockingTest {
         val repository = mock<ApiUserRepository> {
             on { fetch("abcde") } doReturn flow { emit(Result.Success(mockUser)) }
+            on { repos("abcde") } doReturn flow { emit(Result.Success(listOf(mockRepo))) }
         }
 
         val viewmodel = UserViewModel(repository)
         viewmodel.setUserName("abcde")
-        viewmodel.fetch()
+        viewmodel.fetchUserAndRepos()
         val job = launch {
             viewmodel.data
                 .filterNotNull()
                 .collect {
-                    assertThat(it).isInstanceOf(User::class.java)
-                    assertThat(it.login).isEqualTo("octocat")
+                    assertThat(it.first).isInstanceOf(User::class.java)
+                    assertThat(it.first.login).isEqualTo("octocat")
                 }
         }
         job.cancel()
     }
 
     private val mockUser = User(1, "octocat", "https://github.com/images/error/octocat_happy.gif")
+    private val mockRepo = Repo(1, "repos", null, null, "url", 0, 0)
 }

@@ -8,6 +8,7 @@ import android.view.View
 import android.widget.Toast
 import androidx.appcompat.app.AppCompatActivity
 import androidx.databinding.DataBindingUtil
+import androidx.recyclerview.widget.LinearLayoutManager
 import com.example.github.R
 import com.example.github.databinding.ActivityUserBinding
 import com.example.github.ui.bind
@@ -20,6 +21,7 @@ import org.koin.androidx.viewmodel.ext.android.viewModel
 class UserActivity : AppCompatActivity() {
 
     private lateinit var binding: ActivityUserBinding
+    private lateinit var adapter: UserAdapter
 
     private val viewModel by viewModel<UserViewModel>()
 
@@ -51,12 +53,20 @@ class UserActivity : AppCompatActivity() {
 
     private fun initView() {
         supportActionBar?.setDisplayHomeAsUpEnabled(true)
+
+        adapter = UserAdapter(this)
+        binding.recyclerView.also {
+            it.layoutManager = LinearLayoutManager(this)
+            it.adapter = adapter
+        }
     }
 
     private fun bindViewModelEvents() {
         bind(viewModel.data) {
             binding.progress.visibility = View.GONE
-            binding.user = it
+            it?.let { result ->
+                adapter.submitList(result.first, result.second)
+            }
         }
         bind(viewModel.error) {
             binding.progress.visibility = View.GONE
@@ -70,8 +80,9 @@ class UserActivity : AppCompatActivity() {
                 binding.progress.visibility = View.VISIBLE
             }
         }
+
         bind(viewModel.username) {
-            if (!it.isNullOrEmpty()) viewModel.fetch()
+            if (!it.isNullOrEmpty()) viewModel.fetchUserAndRepos()
         }
     }
 

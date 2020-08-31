@@ -1,7 +1,9 @@
 package com.example.github.repository.user
 
+import com.example.github.api.repo.RepoResponse
 import com.example.github.api.user.UserApi
 import com.example.github.api.user.UserResponse
+import com.example.github.entity.Repo
 import com.example.github.entity.common.Result
 import com.example.github.entity.User
 import kotlinx.coroutines.ExperimentalCoroutinesApi
@@ -27,7 +29,22 @@ class ApiUserRepository(
         }
     }
 
+    override fun repos(username: String): Flow<Result<List<Repo>>> {
+        return flow {
+            kotlin.runCatching {
+                api.repos(username)
+            }.fold(
+                onSuccess = { emit(Result.Success(it.map { repo -> repo.toEntity() })) },
+                onFailure = { emit(Result.Error(it)) }
+            )
+        }
+    }
+
     private fun UserResponse.toEntity(): User {
         return User(id, login, imageUrl, bio, blog, followers, following)
+    }
+
+    private fun RepoResponse.toEntity(): Repo {
+        return Repo(id, name, description, language, url, watchersCount, forksCount)
     }
 }
