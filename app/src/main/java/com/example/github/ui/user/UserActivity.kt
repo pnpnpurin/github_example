@@ -15,6 +15,7 @@ import com.example.github.ui.bind
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
 import org.koin.androidx.viewmodel.ext.android.viewModel
+import org.koin.core.parameter.parametersOf
 
 @FlowPreview
 @ExperimentalCoroutinesApi
@@ -23,7 +24,7 @@ class UserActivity : AppCompatActivity() {
     private lateinit var binding: ActivityUserBinding
     private lateinit var adapter: UserAdapter
 
-    private val viewModel by viewModel<UserViewModel>()
+    private val viewModel by viewModel<UserViewModel> { parametersOf(intent.getStringExtra(USER_INTENT_KEY)) }
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -33,12 +34,6 @@ class UserActivity : AppCompatActivity() {
 
         initView()
         bindViewModelEvents()
-
-        intent.getStringExtra(USER_INTENT_KEY)?.let {
-            viewModel.setUserName(it)
-        } ?: run {
-            finish()
-        }
     }
 
     override fun onOptionsItemSelected(item: MenuItem): Boolean {
@@ -79,10 +74,6 @@ class UserActivity : AppCompatActivity() {
             if (it) {
                 binding.progress.visibility = View.VISIBLE
             }
-        }
-
-        bind(viewModel.username) {
-            if (!it.isNullOrEmpty()) viewModel.fetchUserAndRepos()
         }
     }
 

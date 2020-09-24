@@ -15,8 +15,8 @@ object ViewModelModule {
             UserSearchViewModel(get())
         }
 
-        viewModel {
-            UserViewModel(get())
+        viewModel { (username: String) ->
+            UserViewModel(username, get())
         }
     }
 }

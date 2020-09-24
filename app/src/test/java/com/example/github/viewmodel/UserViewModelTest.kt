@@ -23,30 +23,13 @@ class UserViewModelTest {
     val testCoroutineRule = TestCoroutineRule()
 
     @Test
-    fun `when call setUserName after subscribe username then it should can get username`() = testCoroutineRule.runBlockingTest {
-        val repository = mock<ApiUserRepository>()
-
-        val viewmodel = UserViewModel(repository)
-        viewmodel.setUserName("abcde")
-        val job = launch {
-            viewmodel.username
-                .collect {
-                    assertThat(it).isEqualTo("abcde")
-                }
-        }
-        job.cancel()
-    }
-
-    @Test
     fun `when fetch call successfully then it should user entity is set to Result#Success`() = testCoroutineRule.runBlockingTest {
         val repository = mock<ApiUserRepository> {
             on { fetch("abcde") } doReturn flow { emit(Result.Success(mockUser)) }
             on { repos("abcde") } doReturn flow { emit(Result.Success(listOf(mockRepo))) }
         }
 
-        val viewmodel = UserViewModel(repository)
-        viewmodel.setUserName("abcde")
-        viewmodel.fetchUserAndRepos()
+        val viewmodel = UserViewModel("abcde", repository)
         val job = launch {
             viewmodel.data
                 .filterNotNull()
