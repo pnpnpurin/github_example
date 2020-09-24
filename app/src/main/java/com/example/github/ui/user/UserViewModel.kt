@@ -10,8 +10,7 @@ import com.example.github.repository.user.UserRepository
 import kotlinx.coroutines.Dispatchers
 import kotlinx.coroutines.ExperimentalCoroutinesApi
 import kotlinx.coroutines.FlowPreview
-import kotlinx.coroutines.channels.BroadcastChannel
-import kotlinx.coroutines.channels.Channel
+import kotlinx.coroutines.channels.ConflatedBroadcastChannel
 import kotlinx.coroutines.flow.*
 import kotlinx.coroutines.launch
 
@@ -21,7 +20,7 @@ class UserViewModel(
     private val repository: UserRepository
 ) : ViewModel() {
 
-    private val _load = BroadcastChannel<Unit>(Channel.BUFFERED)
+    private val _load = ConflatedBroadcastChannel<Unit>()
     private val load = _load.asFlow()
 
     private val _username = MutableStateFlow("")

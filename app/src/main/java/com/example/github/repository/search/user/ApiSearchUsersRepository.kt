@@ -17,7 +17,9 @@ class ApiSearchUsersRepository(retrofit: Retrofit) : SearchUsersRepository {
     override fun fetch(query: String): Flow<PagingData<User>> {
         return Pager(
             config = PagingConfig(
+                initialLoadSize = ApiConfig.PAGE_SIZE,
                 pageSize = ApiConfig.PAGE_SIZE,
+                prefetchDistance = 1,
                 enablePlaceholders = false
             ),
             pagingSourceFactory = {

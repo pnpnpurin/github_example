@@ -90,6 +90,7 @@ class UserSearchActivity : AppCompatActivity() {
                     is NoResultException -> binding.emptyList.isVisible = true
                     else -> binding.retryButton.isVisible = true
                 }
+                it.error.printStackTrace()
             }
 
             val appendErrorState = loadState.source.append as? LoadState.Error
