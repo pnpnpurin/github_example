@@ -68,6 +68,8 @@ jobs:
           releaseNotes: "test deploy"
           file: app/build/outputs/apk/debug/app-debug.apk
 
+      - name: Set COMMIT_MESSAGE
+        run: echo ::set-env name=COMMIT_MESSAGE::$(echo "${{ github.event.head_commit.message }}" | tr '\n' ' ')
       - name: post message to Slack
         if: success()
         uses: tokorom/action-slack-incoming-webhook@main
@@ -75,3 +77,25 @@ jobs:
           INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           text: "New app was deployed!!"
+          attachments: |
+            [
+              {
+                "color": "good",
+                "author_name": "${{ github.actor }}",
+                "author_icon": "${{ github.event.sender.avatar_url }}",
+                "fields": [
+                  {
+                    "title": "Commit Message",
+                    "value": "${{ env.COMMIT_MESSAGE }}"
+                  },
+                  {
+                    "title": "GitHub Actions URL",
+                    "value": "${{ github.event.repository.url }}/actions/runs/${{ github.run_id }}"
+                  },
+                  {
+                    "title": "Compare URL",
+                    "value": "${{ github.event.compare }}"
+                  }
+                ]
+              }
+            ]
