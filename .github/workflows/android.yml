@@ -69,7 +69,7 @@ jobs:
           file: app/build/outputs/apk/debug/app-debug.apk
 
       - name: Set COMMIT_MESSAGE
-        run: echo ::set-env name=COMMIT_MESSAGE::$(echo "${{ github.event.head_commit.message }}" | tr '\n' ' ')
+        run: echo "commit_message=$(echo "${{ github.event.head_commit.message }}" | tr '\n' ' ')" >> $GITHUB_ENV
       - name: post message to Slack
         if: success()
         uses: tokorom/action-slack-incoming-webhook@main
@@ -86,7 +86,7 @@ jobs:
                 "fields": [
                   {
                     "title": "Commit Message",
-                    "value": "${{ env.COMMIT_MESSAGE }}"
+                    "value": "${{ $commit_message }}"
                   },
                   {
                     "title": "GitHub Actions URL",
