@@ -28,30 +28,30 @@ jobs:
           restore-keys: |
             ${{ runner.os }}-gradle-
 
-  build:
-    needs: setup
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
+#  build:
+#    needs: setup
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
 
-      # Build
-      - name: Build with Gradle
-        run: ./gradlew assembleDebug
+#      # Build
+#      - name: Build with Gradle
+#        run: ./gradlew assembleDebug
 
-      # Unit Test
-      - name: Unit Test
-        run: ./gradlew testDebugUnitTest
-        
-      # Archiving code coverage results
-      - name: Archive code coverage results
-        if: always()
-        uses: actions/upload-artifact@v2
-        with:
-          name: code-coverage-report
-          path: app/build/reports/tests/testDebugUnitTest
+#      # Unit Test
+#      - name: Unit Test
+#        run: ./gradlew testDebugUnitTest
+#
+#      # Archiving code coverage results
+#      - name: Archive code coverage results
+#        if: always()
+#        uses: actions/upload-artifact@v2
+#        with:
+#          name: code-coverage-report
+#          path: app/build/reports/tests/testDebugUnitTest
 
   deploy:
-    needs: build
+    needs: setup
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v2
@@ -75,31 +75,3 @@ jobs:
           INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
         with:
           text: "New app was deployed!!"
-          blocks: |
-            [
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "New app was deployed!! :clap:"
-                }
-              },
-              {
-                "type": "divider"
-              },
-              {
-                "type": "section",
-                "text": {
-                  "type": "mrkdwn",
-                  "text": "*${{ github.event.pull_request.title }}*\nPushed by ${{ github.event.pull_request.user.login }}\n\n*URL*\n${{ github.event.pull_request.url }}"
-                },
-                "accessory": {
-                  "type": "image",
-                  "image_url": "${{ github.event.pull_request.user.avatar_url }}",
-                  "alt_text": "User Icon"
-                }
-              },
-              {
-                "type": "divider"
-              }
-            ]
