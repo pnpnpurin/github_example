@@ -86,7 +86,7 @@ jobs:
                 "fields": [
                   {
                     "title": "Commit Message",
-                    "value": "${{ $commit_message }}"
+                    "value": "$commit_message"
                   },
                   {
                     "title": "GitHub Actions URL",
