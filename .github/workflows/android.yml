@@ -65,4 +65,41 @@ jobs:
           appId: ${{secrets.FIREBASE_APP_ID}}
           token: ${{secrets.FIREBASE_TOKEN}}
           groups: test
+          releaseNotes: "test deploy"
           file: app/build/outputs/apk/debug/app-debug.apk
+
+      - name: post message to Slack
+        if: success()
+        uses: tokorom/action-slack-incoming-webhook@master
+        env:
+          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        with:
+          text: "New app was deployed!!"
+          blocks: |
+            [
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "New app was deployed!! :clap:"
+                }
+              },
+              {
+                "type": "divider"
+              },
+              {
+                "type": "section",
+                "text": {
+                  "type": "mrkdwn",
+                  "text": "*${{ github.event.pull_request.title }}*\nPushed by ${{ github.event.pull_request.user.login }}\n\n*URL*\n${{ github.event.pull_request.url }}"
+                },
+                "accessory": {
+                  "type": "image",
+                  "image_url": "${{ github.event.pull_request.user.avatar_url }}",
+                  "alt_text": "User Icon"
+                }
+              },
+              {
+                "type": "divider"
+              }
+            ]
