@@ -3,6 +3,8 @@ apply plugin: 'kotlin-android'
 apply plugin: 'kotlin-android-extensions'
 apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
+apply plugin: 'com.google.gms.google-services'
+apply plugin: 'com.google.firebase.appdistribution'
 
 apply from: "../ktlint.gradle"
 
@@ -21,6 +23,12 @@ android {
     }
 
     buildTypes {
+        debug {
+            firebaseAppDistribution {
+                releaseNotes="release test"
+                groups="test"
+            }
+        }
         release {
             minifyEnabled false
             proguardFiles getDefaultProguardFile('proguard-android-optimize.txt'), 'proguard-rules.pro'
@@ -56,6 +64,9 @@ dependencies {
 
     implementation 'com.google.android.material:material:1.1.0'
     implementation "androidx.swiperefreshlayout:swiperefreshlayout:1.1.0"
+
+    implementation platform('com.google.firebase:firebase-bom:26.2.0')
+    implementation 'com.google.firebase:firebase-analytics'
 
     def paging_version = "3.0.0-alpha06"
     implementation "androidx.paging:paging-runtime:$paging_version"

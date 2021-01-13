@@ -49,3 +49,20 @@ jobs:
         with:
           name: code-coverage-report
           path: app/build/reports/tests/testDebugUnitTest
+
+  deploy:
+    needs: build
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: Build with Gradle
+        run: ./gradlew assembleDebug
+
+      - name: Firebase App Distribution
+        uses: wzieba/Firebase-Distribution-Github-Action@v1
+        with:
+          appId: ${{secrets.FIREBASE_APP_ID}}
+          token: ${{secrets.FIREBASE_TOKEN}}
+          groups: test
+          file: app/build/outputs/apk/debug/app-debug.apk
