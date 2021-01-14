@@ -60,16 +60,16 @@ jobs:
         run: ./gradlew assembleDebug
 
       - name: Get apk path
-          id: apk-path
-          run: |
+        id: apk-path
+        run: |
             path=$(find **/build/outputs/apk -name '*.apk' -type f | head -1)
             echo "::set-output name=path::$path"
 
       - name: Upload apk file
-          uses: actions/upload-artifact@v2
-          with:
-            name: apk
-            path: ${{ steps.apk-path.outputs.path }}
+        uses: actions/upload-artifact@v2
+        with:
+          name: apk
+          path: ${{ steps.apk-path.outputs.path }}
 
       - name: Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
