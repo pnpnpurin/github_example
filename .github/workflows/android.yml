@@ -59,6 +59,18 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew assembleDebug
 
+      - name: Get apk path
+          id: apk-path
+          run: |
+            path=$(find **/build/outputs/apk -name '*.apk' -type f | head -1)
+            echo "::set-output name=path::$path"
+
+      - name: Upload apk file
+          uses: actions/upload-artifact@v2
+          with:
+            name: apk
+            path: ${{ steps.apk-path.outputs.path }}
+
       - name: Firebase App Distribution
         uses: wzieba/Firebase-Distribution-Github-Action@v1
         with:
@@ -66,7 +78,7 @@ jobs:
           token: ${{secrets.FIREBASE_TOKEN}}
           groups: test
           releaseNotes: "test deploy"
-          file: app/build/outputs/apk/debug/app-debug.apk
+          file: ${{ steps.apk-path.outputs.path }}
 
       - name: Set COMMIT_MESSAGE
         run: echo "commit_message=$(echo ${{ github.event.head_commit.message }} | tr '\n' ' ')" >> $GITHUB_ENV
