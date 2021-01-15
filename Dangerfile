@@ -1,5 +1,3 @@
-github.dismiss_out_of_range_messages
-
 # Ignore inline messages which lay outside a diff's range of PR
 github.dismiss_out_of_range_messages
 
@@ -9,3 +7,6 @@ warn("PR is classed as Work in Progress") if github.pr_title.include? "[WIP]"
 # ktlint
 checkstyle_format.base_path = Dir.pwd
 checkstyle_format.report 'app/build/reports/ktlint-results.xml'
+
+# detekt
+checkstyle_format.report 'app/build/reports/detekt/detekt.xml'
