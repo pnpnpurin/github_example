@@ -14,7 +14,6 @@ jobs:
       - uses: actions/checkout@v2
       # slack
       - name: post message to Slack
-      if: success()
       uses: tokorom/action-slack-incoming-webhook@main
       env:
         INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
