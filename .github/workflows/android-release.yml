@@ -14,7 +14,7 @@ jobs:
       - name: Set APP_VERSION
         id: app_version
         run: |
-          VERSION=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+.[0-9]+')
+          VERSION=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+')
           echo "::set-output name=version::$VERSION"
       - name: Build with Gradle
         run: echo ${{ steps.app_version.outputs.version }}
