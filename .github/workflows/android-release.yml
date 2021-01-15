@@ -1,8 +1,9 @@
 name: Android Release Workflow
 
 on:
-  push:
-    branches: [ develop ]
+  pull_request:
+    branches:
+      - develop
 
   workflow_dispatch:
 
