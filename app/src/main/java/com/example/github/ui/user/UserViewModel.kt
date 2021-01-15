@@ -17,7 +17,7 @@ import kotlinx.coroutines.flow.*
 class UserViewModel(
     username: String,
     repository: UserRepository
-) : ViewModel() {
+):ViewModel() {
 
     private val response = MutableStateFlow<Result<Pair<User, List<Repo>?>>>(Result.Ready)
     val loading = response.map { it.isLoading }
