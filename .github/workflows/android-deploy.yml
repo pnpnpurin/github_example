@@ -2,7 +2,7 @@ name: Android Deploy Workflow
 
 on:
   push:
-    branches: [ develop ]
+    branches: [ master ]
 
 jobs:
   deploy:
