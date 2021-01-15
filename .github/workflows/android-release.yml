@@ -1,4 +1,4 @@
-name: Android Release Workflow
+name: Android Release Workflow2
 
 on:
   pull_request:
