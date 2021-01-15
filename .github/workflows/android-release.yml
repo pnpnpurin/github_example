@@ -7,12 +7,12 @@ on:
   workflow_dispatch:
 
 jobs:
-  setup:
+  deploy:
     runs-on: ubuntu-latest
     steps:
-      # Checkout
       - uses: actions/checkout@v2
-      # slack
+      - name: Build with Gradle
+        run: echo "hoge"
       - name: post messaage to slack
       uses: tokorom/action-slack-incoming-webhook@main
       env:
