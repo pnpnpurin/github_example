@@ -13,12 +13,12 @@ jobs:
       # Checkout
       - uses: actions/checkout@v2
       # slack
-      - name: post message to Slack
-      uses: tokorom/action-slack-incoming-webhook@main
-      env:
-        INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-      with:
-        text: ":clap: New app was deployed!! :clap:"
+#      - name: post message to Slack
+#      uses: tokorom/action-slack-incoming-webhook@main
+#      env:
+#        INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#      with:
+#        text: ":clap: New app was deployed!! :clap:"
 #        attachments: |
 #          [
 #            {
