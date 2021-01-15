@@ -15,9 +15,8 @@ jobs:
         run: echo "hoge"
       - name: post messaage to slack
         uses: tokorom/action-slack-incoming-webhook@main
-#      uses: tokorom/action-slack-incoming-webhook@main
-#      env:
-#        INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+        env:
+          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #      with:
 #        text: ":clap: New app was deployed!! :clap:"
 #        attachments: |
