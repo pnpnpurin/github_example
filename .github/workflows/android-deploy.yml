@@ -39,7 +39,7 @@ jobs:
                   },
                   {
                     "title": "Commit URL",
-                    "value": "${{ github.event.pull_request.html_url }}/commits/${{ steps.app-version.outputs.version }}"
+                    "value": "${{ github.event.pull_request.html_url }}/commits/${{ steps.commit-hash.outputs.name }}"
                   },
                   {
                     "title": "Action URL",
