@@ -16,7 +16,7 @@ jobs:
         id: commit-hash
         run: |
           sha=${{ github.event.pull_request.head.sha }}
-          echo "::set-output name=sha-short::$(echo ${sha:0:5})"
+          echo "::set-output name=sha-short::$(echo ${sha:0:7})"
       - name: post message to Slack
         uses: tokorom/action-slack-incoming-webhook@main
         env:
