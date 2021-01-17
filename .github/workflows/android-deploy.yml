@@ -8,8 +8,6 @@ jobs:
   one:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
       - name: Dump GitHub context
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
@@ -17,7 +15,7 @@ jobs:
       - name:
         id: commit-hash
         run: |
-          echo "::set-output name=sha-short::$(git rev-parse --short HEAD)"
+          echo "::set-output name=sha-short::${{ github.event.pull_request.sha }}"
       - name: post message to Slack
         uses: tokorom/action-slack-incoming-webhook@main
         env:
