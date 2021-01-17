@@ -12,22 +12,6 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
-      - name: Dump steps context
-        env:
-          STEPS_CONTEXT: ${{ toJson(steps) }}
-        run: echo "$STEPS_CONTEXT"
-      - name: Dump runner context
-        env:
-          RUNNER_CONTEXT: ${{ toJson(runner) }}
-        run: echo "$RUNNER_CONTEXT"
-      - name: Dump strategy context
-        env:
-          STRATEGY_CONTEXT: ${{ toJson(strategy) }}
-        run: echo "$STRATEGY_CONTEXT"
-      - name: Dump matrix context
-        env:
-          MATRIX_CONTEXT: ${{ toJson(matrix) }}
-        run: echo "$MATRIX_CONTEXT"
       - name: post message to Slack
         uses: tokorom/action-slack-incoming-webhook@main
         env:
@@ -46,12 +30,12 @@ jobs:
                     "value": "${{ github.event.pull_request.title }}"
                   },
                   {
-                    "title": "URL",
-                    "value": "${{ github.event.pull_request.url }}"
+                    "title": "PR URL",
+                    "value": "${{ github.event.pull_request.html_url }}"
                   },
                   {
-                    "title": "action",
-                    "value": "${{ github.run_id }}"
+                    "title": "Action URL",
+                    "value": "${{ github.event.repository.html_url }}/actions/runs/${{ github.run_id }}"
                   }
                 ]
               }
