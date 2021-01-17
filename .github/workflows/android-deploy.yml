@@ -12,6 +12,10 @@ jobs:
         env:
           GITHUB_CONTEXT: ${{ toJson(github) }}
         run: echo "$GITHUB_CONTEXT"
+      - name:
+        id: commit-hash
+        run: |
+          echo "::set-output name=sha-short::$(git rev-parse --short HEAD)"
       - name: post message to Slack
         uses: tokorom/action-slack-incoming-webhook@main
         env:
@@ -32,6 +36,10 @@ jobs:
                   {
                     "title": "PR URL",
                     "value": "${{ github.event.pull_request.html_url }}"
+                  },
+                  {
+                    "title": "Commit URL",
+                    "value": "${{ github.event.pull_request.html_url }}/commits/${{ steps.app-version.outputs.version }}"
                   },
                   {
                     "title": "Action URL",
