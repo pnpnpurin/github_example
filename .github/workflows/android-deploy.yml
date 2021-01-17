@@ -1,61 +1,73 @@
 name: Android Deploy Workflow
 
 on:
-  push:
-    branches: [ master ]
+  pull_request:
+    branches: [ develop ]
 
 jobs:
-  deploy:
+  one:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v2
-
-      - name: Build with Gradle
-        run: ./gradlew assembleDebug
-
-      - name: Get apk path
-        id: apk-path
-        run: |
-          path=$(find **/build/outputs/apk -name '*.apk' -type f | head -1)
-          echo "::set-output name=path::$path"
-
-      - name: Firebase App Distribution
-        uses: wzieba/Firebase-Distribution-Github-Action@v1
-        with:
-          appId: ${{secrets.FIREBASE_APP_ID}}
-          token: ${{secrets.FIREBASE_TOKEN}}
-          groups: test
-          releaseNotes: "test deploy"
-          file: ${{ steps.apk-path.outputs.path }}
-
-      - name: Set COMMIT_MESSAGE
-        run: echo "commit_message=$(echo ${{ github.event.head_commit.message }} | tr '\n' ' ')" >> $GITHUB_ENV
-      - name: post message to Slack
-        if: success()
-        uses: tokorom/action-slack-incoming-webhook@main
+      - name: Dump GitHub context
         env:
-          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          text: "New app was deployed!!"
-          attachments: |
-            [
-              {
-                "color": "good",
-                "author_name": "${{ github.actor }}",
-                "author_icon": "${{ github.event.sender.avatar_url }}",
-                "fields": [
-                  {
-                    "title": "Commit Message",
-                    "value": "${{ env.commit_message }}"
-                  },
-                  {
-                    "title": "GitHub Actions URL",
-                    "value": "${{ github.event.repository.url }}/actions/runs/${{ github.run_id }}"
-                  },
-                  {
-                    "title": "Compare URL",
-                    "value": "${{ github.event.compare }}"
-                  }
-                ]
-              }
-            ]
+          GITHUB_CONTEXT: ${{ toJson(github) }}
+        run: echo "$GITHUB_CONTEXT"
+      - name: Dump job context
+        env:
+          JOB_CONTEXT: ${{ toJson(job) }}
+        run: echo "$JOB_CONTEXT"
+#jobs:
+#  deploy:
+#    runs-on: ubuntu-latest
+#    steps:
+#      - uses: actions/checkout@v2
+#
+#      - name: Build with Gradle
+#        run: ./gradlew assembleDebug
+#
+#      - name: Get apk path
+#        id: apk-path
+#        run: |
+#          path=$(find **/build/outputs/apk -name '*.apk' -type f | head -1)
+#          echo "::set-output name=path::$path"
+#
+#      - name: Firebase App Distribution
+#        uses: wzieba/Firebase-Distribution-Github-Action@v1
+#        with:
+#          appId: ${{secrets.FIREBASE_APP_ID}}
+#          token: ${{secrets.FIREBASE_TOKEN}}
+#          groups: test
+#          releaseNotes: "test deploy"
+#          file: ${{ steps.apk-path.outputs.path }}
+#
+#      - name: Set COMMIT_MESSAGE
+#        run: echo "commit_message=$(echo ${{ github.event.head_commit.message }} | tr '\n' ' ')" >> $GITHUB_ENV
+#      - name: post message to Slack
+#        if: success()
+#        uses: tokorom/action-slack-incoming-webhook@main
+#        env:
+#          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        with:
+#          text: "New app was deployed!!"
+#          attachments: |
+#            [
+#              {
+#                "color": "good",
+#                "author_name": "${{ github.actor }}",
+#                "author_icon": "${{ github.event.sender.avatar_url }}",
+#                "fields": [
+#                  {
+#                    "title": "Commit Message",
+#                    "value": "${{ env.commit_message }}"
+#                  },
+#                  {
+#                    "title": "GitHub Actions URL",
+#                    "value": "${{ github.event.repository.url }}/actions/runs/${{ github.run_id }}"
+#                  },
+#                  {
+#                    "title": "Compare URL",
+#                    "value": "${{ github.event.compare }}"
+#                  }
+#                ]
+#              }
+#            ]

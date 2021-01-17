@@ -2,7 +2,7 @@ name: Android Release Workflow2
 
 # Launches when create PR to the develop branch
 on:
-  pull_request:
+  push:
     branches:
       - develop
 
