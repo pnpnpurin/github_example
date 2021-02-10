@@ -10,7 +10,9 @@ jobs:
     steps:
       - name: Test Android
         run: |
-          $ANDROID_HOME/platform-tools/adb devices -l
+          sed -i -r -e 's/versionName "[0-9]+\.[0-9]+\.[0-9]+"/versionName "${{ github.event.inputs.version }}"/g' ./app/build.gradle
+          NAME=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+.[0-9]+')
+          echo "::set-output name=name::$NAME"
 
 #jobs:
 #  one:
@@ -58,6 +60,7 @@ jobs:
 #              }
 #            ]
 
+<<<<<<< Updated upstream
 #jobs:
 #  deploy:
 #    runs-on: ubuntu-latest
@@ -113,3 +116,16 @@ jobs:
 #                ]
 #              }
 #            ]
+=======
+      - name: Create release pr
+        continue-on-error: true
+        env:
+          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PR_RELEASE_TEMPLATE: .github/workflows/.git-pr-template
+          GIT_PR_RELEASE_BRANCH_PRODUCTION: master
+          GIT_PR_RELEASE_BRANCH_STAGING: release_${{ steps.version.outputs.name }}
+          GIT_PR_RELEASE_LABELS: Release
+        run: |
+          gem install -N git-pr-release -v "1.4.0"
+          git-pr-release --no-fetch
+>>>>>>> Stashed changes

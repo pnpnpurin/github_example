@@ -2,72 +2,42 @@ name: Android Release Workflow2
 
 # Launches when create PR to the develop branch
 on:
-  push:
-    branches:
-      - develop
-
-  workflow_dispatch:
+  pull_request:
+    branches: [ develop ]
+#  pull_request:
+#    branches:
+#      - master
+#    types: [closed]
 
 jobs:
-  deploy:
+  release:
     runs-on: ubuntu-latest
+#    if: github.event.pull_request.merged == true
+
     steps:
       - uses: actions/checkout@v2
-
-      - name: Setup Ruby
-        uses: actions/setup-ruby@v1
-        with:
-          ruby-version: '2.x'
-
-      - name: cache bundle
-        uses: actions/cache@v2
-        with:
-          path: vendor/bundle
-          key: ${{ runner.os }}-gems-${{ hashFiles('**/Gemfile.lock') }}
-          restore-keys: |
-            ${{ runner.os }}-gems-
-
-      - name: setup bundle
+      - name: hoge
         run: |
-          gem install bundler
-          bundle config path vendor/bundle
-          bundle install --jobs 4 --retry 3
+          echo '${{ toJSON(github) }}'
 
-      - name: Run detekt
-        continue-on-error: true
-        run: ./gradlew detekt
-
-      - name: Run ktlin
-        run: ./gradlew ktlint
-
-      - name: Run Danger
-        env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-        run: |
-          bundle exec danger
-
-  build:
-    runs-on: ubuntu-latest
-    steps:
-      - uses: actions/checkout@v2
-      - name:
-        id: commit-hash
-        run: |
-          echo "::set-output name=sha-short::$(git rev-parse --short HEAD)"
-      - name: Set APP_VERSION
-        id: app-version
-        run: |
-          VERSION=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+')
-          echo "::set-output name=version::$VERSION"
-      - name: Build with Gradle
-        run: echo ${{ steps.app-version.outputs.version }}
-      - name: post messaage to slack
-        uses: tokorom/action-slack-incoming-webhook@main
-        env:
-          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
-        with:
-          text: ":clap: New app was deployed!! :clap: ${{ steps.app-version.outputs.version }} - ${{ steps.commit-hash.outputs.sha-short }}"
-#        attachments: |
+#      - name:
+#        id: commit-hash
+#        run: |
+#          echo "::set-output name=sha-short::$(git rev-parse --short HEAD)"
+#      - name: Set APP_VERSION
+#        id: app-version
+#        run: |
+#          VERSION=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+')
+#          echo "::set-output name=version::$VERSION"
+#      - name: Build with Gradle
+#        run: echo ${{ steps.app-version.outputs.version }}
+#      - name: post messaage to slack
+#        uses: tokorom/action-slack-incoming-webhook@main
+#        env:
+#          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        with:
+#          text: ":clap: New app was deployed!! :clap: ${{ steps.app-version.outputs.version }} - ${{ steps.commit-hash.outputs.sha-short }}"
+##        attachments: |
 #          [
 #            {
 #              "color": "good",
