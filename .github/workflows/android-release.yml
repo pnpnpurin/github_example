@@ -49,8 +49,8 @@ jobs:
 
             version ${{ steps.get_version.outputs.version }}
             plz check -> ${{ github.event.pull_request.html_url }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
 #      - name:
 #        id: commit-hash
 #        run: |
