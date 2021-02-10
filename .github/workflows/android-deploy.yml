@@ -15,6 +15,13 @@ jobs:
         run: echo ${{ github.event.inputs.version }} | grep -Eo '[0-9]+\.[0-9]+\.[0-9]+'
 
       - uses: actions/checkout@v2
+        with:
+          fetch-depth: 0
+
+      - name: Setup Ruby
+        uses: actions/setup-ruby@v1
+        with:
+          ruby-version: 2.x
 
       - name: VERSION
         id: version
@@ -22,9 +29,6 @@ jobs:
           sed -i -r -e 's/versionName "[0-9]+\.[0-9]+\.[0-9]+"/versionName "${{ github.event.inputs.version }}"/g' app/build.gradle
           NAME=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+.[0-9]+')
           echo "::set-output name=name::$NAME"
-
-      - name: Hogeeeee
-        run: echo ${{ steps.version.outputs.name }}
 
       - name: branch
         env:
@@ -35,3 +39,12 @@ jobs:
           git checkout -b release_${{ steps.version.outputs.name }}
           git commit -m "Release ${{ steps.version.outputs.name }}" -a
           git push origin release_${{ steps.version.outputs.name }}
+
+      - name: Create release pr
+        env:
+          GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PR_RELEASE_BRANCH_PRODUCTION: master
+          GIT_PR_RELEASE_BRANCH_STAGING: release_${{ steps.version.outputs.name }}
+        run: |
+          gem install -N git-pr-release
+          git-pr-release --no-fetch
