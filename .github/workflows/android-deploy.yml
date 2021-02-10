@@ -28,5 +28,6 @@ jobs:
 
       - name: branch
         run: |
+          git commit -a -m "Release ${{ steps.version.outputs.name }}"
           git checkout -b release_${{ steps.version.outputs.name }}
           git push origin release_${{ steps.version.outputs.name }}
