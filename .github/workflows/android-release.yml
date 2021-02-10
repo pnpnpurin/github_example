@@ -17,10 +17,19 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
+#      - name: hoge
+#        run: |
+#          echo '${{ toJSON(github) }}'
+
+      - name: Get version
+        id: get_version
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: echo ::set-output name=VERSION::${HEAD_REF}
+
       - name: hoge
         run: |
-          echo '${{ toJSON(github) }}'
-
+          echo '${{ steps.get_version.outputs.VERSION }}'
 #      - name:
 #        id: commit-hash
 #        run: |
