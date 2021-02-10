@@ -30,10 +30,13 @@ jobs:
 
       - name: hoge
         id: date
+        env:
+          TZ: 'Asia/Tokyo'
         run: |
           DATE=`date +"%Y-%m-%d %H:%M"`
           echo ::set-output name=date::$DATE
           echo '${{ steps.get_version.outputs.version }}'
+          echo ${{ github.event.pull_request.html_url }}
 
       - name: Create Release
         id: create_release
@@ -47,7 +50,7 @@ jobs:
             ${{ steps.date.outputs.date }}
 
             version ${{ steps.get_version.outputs.version }}
-            plz check -> ${{ github.event.pull_request.head.html_url }}
+            plz check -> ${{ github.event.pull_request.html_url }}
           draft: true
           prerelease: true
 #      - name:
