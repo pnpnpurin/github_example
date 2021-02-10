@@ -46,6 +46,7 @@ jobs:
           GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_PR_RELEASE_BRANCH_PRODUCTION: master
           GIT_PR_RELEASE_BRANCH_STAGING: release_${{ steps.version.outputs.name }}
+          GIT_PR_RELEASE_LABELS: Release
         run: |
           gem install -N git-pr-release -v "1.4.0"
           git-pr-release --no-fetch
