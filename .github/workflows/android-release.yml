@@ -76,7 +76,7 @@ jobs:
               repo: context.repo.repo,
               title: "Merge release_${{ steps.get_version.outputs.version }} into master",
               body: "test",
-              head: "${context.repo.owner}:${{ steps.branch.outputs.name }}",
+              head: `${context.repo.owner}:${{ steps.branch.outputs.name }}`,
               base: "master"
             })
 
