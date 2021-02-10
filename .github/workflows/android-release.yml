@@ -18,8 +18,9 @@ jobs:
 
     steps:
       - uses: actions/checkout@v2
-#      - name: hoge
-#        run: |
+      - name: aa
+        run: |
+          git status
 #          echo '${{ toJSON(github) }}'
 
       - name: Get version
@@ -49,8 +50,26 @@ jobs:
 
             version ${{ steps.get_version.outputs.version }}
             plz check -> ${{ github.event.pull_request.html_url }}
-          draft: false
+          draft: true
           prerelease: false
+
+      - name: fuga
+        id: branch
+        run: |
+          echo "::set-output name=name::merge_v${{ steps.version.outputs.name }}_into_master"
+
+      - name: branch
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          git status
+#          git config --local user.email "68937274+pnpnpurin@users.noreply.github.com"
+#          git config --local user.name "Github-Actions[bot]"
+          git checkout -b ${{ steps.branch.outputs.name }}
+#          git commit -m "Merge release ${{ steps.version.outputs.name }} into develop"
+          git status
+          git push origin ${{ steps.branch.outputs.name }}
+
 #      - name:
 #        id: commit-hash
 #        run: |
