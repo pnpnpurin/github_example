@@ -3,7 +3,9 @@ name: Android Release Workflow2
 # Launches when create PR to the develop branch
 on:
   pull_request:
-    branches: [ develop ]
+    branches:
+      - develop
+    types: [closed]
 #  pull_request:
 #    branches:
 #      - master
@@ -12,8 +14,7 @@ on:
 jobs:
   release:
     runs-on: ubuntu-latest
-    if: contains(join(github.event.pull_request.labels.*.name), 'Release')
-#    if: github.event.pull_request.merged == true
+    if: github.event.pull_request.merged == true && contains(join(github.event.pull_request.labels.*.name), 'Release')
 
     steps:
       - uses: actions/checkout@v2
@@ -25,11 +26,30 @@ jobs:
         id: get_version
         env:
           HEAD_REF: ${{ github.event.pull_request.head.ref }}
-        run: echo ::set-output name=VERSION::${HEAD_REF#test}
+        run: echo ::set-output name=version::${HEAD_REF#release_}
 
       - name: hoge
+        id: date
         run: |
-          echo '${{ steps.get_version.outputs.VERSION }}'
+          DATE=`date +"%Y-%m-%d %H:%M"`
+          echo ::set-output name=date::$DATE
+          echo '${{ steps.get_version.outputs.version }}'
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: v${{ steps.get_version.outputs.version }}
+          body: |+
+            ${{ steps.date.outputs.date }}
+
+            version ${{ steps.get_version.outputs.version }}
+            plz check -> ${{ github.event.pull_request.head.html_url }}
+          draft: true
+          prerelease: true
 #      - name:
 #        id: commit-hash
 #        run: |
