@@ -25,3 +25,8 @@ jobs:
 
       - name: Hogeeeee
         run: echo ${{ steps.version.outputs.name }}
+
+      - name: branch
+        run: |
+          git checkout -b release_${{ steps.version.outputs.name }}
+          git push origin release_${{ steps.version.outputs.name }}
