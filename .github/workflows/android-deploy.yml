@@ -21,7 +21,7 @@ jobs:
       - name: Setup Ruby
         uses: actions/setup-ruby@v1
         with:
-          ruby-version: 2.x
+          ruby-version: 2.7.x
 
       - name: VERSION
         id: version
@@ -41,10 +41,11 @@ jobs:
           git push origin release_${{ steps.version.outputs.name }}
 
       - name: Create release pr
+        continue-on-error: true
         env:
           GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_PR_RELEASE_BRANCH_PRODUCTION: master
           GIT_PR_RELEASE_BRANCH_STAGING: release_${{ steps.version.outputs.name }}
         run: |
-          gem install -N git-pr-release
+          gem install -N git-pr-release -v "1.4.0"
           git-pr-release --no-fetch
