@@ -41,6 +41,7 @@ jobs:
           git push origin release_${{ steps.version.outputs.name }}
 
       - name: Create release pr
+        continue-on-error: true
         env:
           GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           GIT_PR_RELEASE_BRANCH_PRODUCTION: master
