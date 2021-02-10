@@ -8,7 +8,7 @@ on:
         required: true
 
 jobs:
-  deploy:
+  one:
     runs-on: ubuntu-latest
     steps:
       - name: check
@@ -44,6 +44,7 @@ jobs:
         continue-on-error: true
         env:
           GIT_PR_RELEASE_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GIT_PR_RELEASE_TEMPLATE: .github/workflows/.git-pr-template
           GIT_PR_RELEASE_BRANCH_PRODUCTION: master
           GIT_PR_RELEASE_BRANCH_STAGING: release_${{ steps.version.outputs.name }}
           GIT_PR_RELEASE_LABELS: Release

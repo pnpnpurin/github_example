@@ -1,34 +1,72 @@
-name: Android Release Workflow
+name: Android Release Workflow2
 
+# Launches when create PR to the develop branch
 on:
   pull_request:
     branches:
       - develop
-
-  workflow_dispatch:
+    types: [closed]
+#  pull_request:
+#    branches:
+#      - master
+#    types: [closed]
 
 jobs:
-  deploy:
+  release:
     runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && contains(join(github.event.pull_request.labels.*.name), 'Release')
+
     steps:
       - uses: actions/checkout@v2
-      - name:
-        id: commit-hash
-        run: |
-          echo "::set-output name=sha-short::$(git rev-parse --short HEAD)"
-      - name: Set APP_VERSION
-        id: app-version
-        run: |
-          VERSION=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+')
-          echo "::set-output name=version::$VERSION"
-      - name: Build with Gradle
-        run: echo ${{ steps.app-version.outputs.version }}
-      - name: post messaage to slack
-        uses: tokorom/action-slack-incoming-webhook@main
+#      - name: hoge
+#        run: |
+#          echo '${{ toJSON(github) }}'
+
+      - name: Get version
+        id: get_version
         env:
-          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: echo ::set-output name=version::${HEAD_REF#release_}
+
+      - name: hoge
+        id: date
+        run: |
+          DATE=`date +"%Y-%m-%d %H:%M"`
+          echo ::set-output name=date::$DATE
+          echo '${{ steps.get_version.outputs.version }}'
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
         with:
-          text: ":clap: New app was deployed!! :clap: ${{ steps.app-version.outputs.version }} - ${{ steps.commit-hash.outputs.sha-short }}"
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: v${{ steps.get_version.outputs.version }}
+          body: |+
+            ${{ steps.date.outputs.date }}
+
+            version ${{ steps.get_version.outputs.version }}
+            plz check -> ${{ github.event.pull_request.head.html_url }}
+          draft: true
+          prerelease: true
+#      - name:
+#        id: commit-hash
+#        run: |
+#          echo "::set-output name=sha-short::$(git rev-parse --short HEAD)"
+#      - name: Set APP_VERSION
+#        id: app-version
+#        run: |
+#          VERSION=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+')
+#          echo "::set-output name=version::$VERSION"
+#      - name: Build with Gradle
+#        run: echo ${{ steps.app-version.outputs.version }}
+#      - name: post messaage to slack
+#        uses: tokorom/action-slack-incoming-webhook@main
+#        env:
+#          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        with:
+#          text: ":clap: New app was deployed!! :clap: ${{ steps.app-version.outputs.version }} - ${{ steps.commit-hash.outputs.sha-short }}"
 #        attachments: |
 #          [
 #            {
