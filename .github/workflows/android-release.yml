@@ -38,7 +38,7 @@ jobs:
 #          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
 #        with:
 #          text: ":clap: New app was deployed!! :clap: ${{ steps.app-version.outputs.version }} - ${{ steps.commit-hash.outputs.sha-short }}"
-##        attachments: |
+#        attachments: |
 #          [
 #            {
 #              "color": "good",
