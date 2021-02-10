@@ -18,6 +18,7 @@ jobs:
       - uses: actions/checkout@v2
       - name: hoge
         run: |
+          if: "contains(join(github.event.pull_request.labels.*.name) , 'Release')"
           echo '${{ toJSON(github) }}'
 
 #      - name:
