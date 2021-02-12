@@ -52,7 +52,7 @@ jobs:
             version ${{ steps.get_version.outputs.version }}
             plz check -> ${{ github.event.pull_request.html_url }}
           draft: true
-          prerelease: false
+          prerelease: true
 
       - name: fuga
         id: branch
@@ -61,9 +61,7 @@ jobs:
 
       - name: branch
         run: |
-          git status
           git checkout -b ${{ steps.branch.outputs.name }}
-          git status
           git push origin ${{ steps.branch.outputs.name }}
 
       - name: Create pull request
