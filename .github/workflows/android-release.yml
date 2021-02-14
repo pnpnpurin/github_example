@@ -1,0 +1,120 @@
+name: Android Release Workflow2
+
+# Launches when create PR to the develop branch
+on:
+  pull_request:
+    branches:
+      - master
+    types: [closed]
+
+jobs:
+  release:
+    runs-on: ubuntu-latest
+    if: github.event.pull_request.merged == true && contains(join(github.event.pull_request.labels.*.name), 'Release')
+
+    steps:
+      - uses: actions/checkout@v2
+
+      - name: aa
+        run: |
+          git status
+
+      - name: Get version
+        id: get_version
+        env:
+          HEAD_REF: ${{ github.event.pull_request.head.ref }}
+        run: echo ::set-output name=version::${HEAD_REF#release_}
+
+      - name: hoge
+        id: date
+        env:
+          TZ: 'Asia/Tokyo'
+        run: |
+          DATE=`date +"%Y-%m-%d %H:%M"`
+          echo ::set-output name=date::$DATE
+
+      - name: Create Release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        with:
+          tag_name: v${{ steps.get_version.outputs.version }}
+          release_name: v${{ steps.get_version.outputs.version }}
+          body: |+
+            ${{ steps.date.outputs.date }}
+
+            version ${{ steps.get_version.outputs.version }}
+            plz check -> ${{ github.event.pull_request.html_url }}
+          draft: false
+          prerelease: false
+
+      - name: fuga
+        id: branch
+        run: |
+          echo "::set-output name=name::merge_v${{ steps.get_version.outputs.version }}_into_develop"
+
+      - name: branch
+        run: |
+          git checkout -b ${{ steps.branch.outputs.name }}
+          git push origin ${{ steps.branch.outputs.name }}
+
+      - name: Create pull request
+        uses: actions/github-script@v3
+        with:
+          github-token: ${{ secrets.GITHUB_TOKEN }}
+          script: |
+            github.pulls.create({
+              owner: context.repo.owner,
+              repo: context.repo.repo,
+              title: "Merge release_${{ steps.get_version.outputs.version }} into develop",
+              body: "test",
+              head: `${context.repo.owner}:${{ steps.branch.outputs.name }}`,
+              base: "develop"
+            })
+
+#        env:
+#          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+#          git config --local user.email "68937274+pnpnpurin@users.noreply.github.com"
+#          git config --local user.name "Github-Actions[bot]"
+#          git commit -m "Merge release ${{ steps.version.outputs.name }} into develop"
+
+#      - name:
+#        id: commit-hash
+#        run: |
+#          echo "::set-output name=sha-short::$(git rev-parse --short HEAD)"
+#      - name: Set APP_VERSION
+#        id: app-version
+#        run: |
+#          VERSION=$(grep -Eo 'versionName ".*"' ./app/build.gradle | grep -Eo '[0-9]+.[0-9]+')
+#          echo "::set-output name=version::$VERSION"
+#      - name: Build with Gradle
+#        run: echo ${{ steps.app-version.outputs.version }}
+#      - name: post messaage to slack
+#        uses: tokorom/action-slack-incoming-webhook@main
+#        env:
+#          INCOMING_WEBHOOK_URL: ${{ secrets.SLACK_WEBHOOK_URL }}
+#        with:
+#          text: ":clap: New app was deployed!! :clap: ${{ steps.app-version.outputs.version }} - ${{ steps.commit-hash.outputs.sha-short }}"
+#        attachments: |
+#          [
+#            {
+#              "color": "good",
+#              "author_name": "${{ github.actor }}",
+#              "author_icon": "${{ github.event.sender.avatar_url }}",
+#              "fields": [
+#                {
+#                  "title": "Commit Message",
+#                  "value": "${{ env.commit_message }}"
+#                },
+#                {
+#                  "title": "GitHub Actions URL",
+#                  "value": "${{ github.event.repository.url }}/actions/runs/${{ github.run_id }}"
+#                },
+#                {
+#                  "title": "Compare URL",
+#                  "value": "${{ github.event.compare }}"
+#                }
+#              ]
+#            }
+#          ]

@@ -4,6 +4,7 @@ import com.example.github.BuildConfig
 import okhttp3.Interceptor
 import okhttp3.Response
 
+// hoge
 object ApiInterceptions {
     fun interceptNetworkingException(chain: Interceptor.Chain): Response {
         return try {

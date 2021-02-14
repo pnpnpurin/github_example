@@ -5,6 +5,7 @@ apply plugin: 'kotlin-kapt'
 apply plugin: 'kotlinx-serialization'
 apply plugin: 'com.google.gms.google-services'
 apply plugin: 'com.google.firebase.appdistribution'
+apply plugin: 'io.gitlab.arturbosch.detekt'
 
 apply from: "../ktlint.gradle"
 
@@ -17,7 +18,7 @@ android {
         minSdkVersion 24
         targetSdkVersion 29
         versionCode 1
-        versionName "1.0"
+        versionName "1.1.0"
 
         testInstrumentationRunner "androidx.test.runner.AndroidJUnitRunner"
     }
@@ -46,6 +47,27 @@ android {
 
     kotlinOptions {
         jvmTarget = '1.8'
+    }
+}
+
+detekt {
+    failFast = true
+    buildUponDefaultConfig = true
+    config = files("$projectDir/config/detekt/detekt.yml")
+
+    reports {
+        xml {
+            enabled = true
+            destination = file("build/reports/detekt/detekt.xml")
+        }
+        html {
+            enabled = false
+            destination = file("build/reports/detekt/detekt.html")
+        }
+        txt {
+            enabled = false
+            destination = file("build/reports/detekt/detekt.txt")
+        }
     }
 }
 
