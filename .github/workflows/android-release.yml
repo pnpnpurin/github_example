@@ -4,12 +4,8 @@ name: Android Release Workflow2
 on:
   pull_request:
     branches:
-      - develop
+      - master
     types: [closed]
-#  pull_request:
-#    branches:
-#      - master
-#    types: [closed]
 
 jobs:
   release:
@@ -51,13 +47,13 @@ jobs:
 
             version ${{ steps.get_version.outputs.version }}
             plz check -> ${{ github.event.pull_request.html_url }}
-          draft: true
-          prerelease: true
+          draft: false
+          prerelease: false
 
       - name: fuga
         id: branch
         run: |
-          echo "::set-output name=name::merge_v${{ steps.get_version.outputs.version }}_into_master"
+          echo "::set-output name=name::merge_v${{ steps.get_version.outputs.version }}_into_develop"
 
       - name: branch
         run: |
@@ -72,10 +68,10 @@ jobs:
             github.pulls.create({
               owner: context.repo.owner,
               repo: context.repo.repo,
-              title: "Merge release_${{ steps.get_version.outputs.version }} into master",
+              title: "Merge release_${{ steps.get_version.outputs.version }} into develop",
               body: "test",
               head: `${context.repo.owner}:${{ steps.branch.outputs.name }}`,
-              base: "master"
+              base: "develop"
             })
 
 #        env:
