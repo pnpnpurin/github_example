@@ -18,7 +18,6 @@ jobs:
       - name: aa
         run: |
           git status
-#          echo '${{ toJSON(github) }}'
 
       - name: Get version
         id: get_version
