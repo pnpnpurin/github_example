@@ -2,6 +2,9 @@ name: Android Deploy Workflow
 
 on:
   workflow_dispatch:
+    branches:
+      - develop
+      - 'release_*'
     inputs:
       version:
         description: 'New version'
