@@ -2,7 +2,7 @@ name: Android Build & Test Workflow
 
 on:
   push:
-    branches: [ master ]
+    branches: [ develop ]
 
 jobs:
   setup:
