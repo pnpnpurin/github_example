@@ -1,7 +1,7 @@
 name: Android Build & Test Workflow
 
 on:
-  push:
+  pull_request:
     branches: [ develop ]
 
 jobs:
