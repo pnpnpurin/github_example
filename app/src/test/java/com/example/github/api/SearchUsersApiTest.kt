@@ -45,7 +45,7 @@ class SearchUsersApiTest {
 
         val request = server.takeRequest()
         assertThat(request.path).isEqualTo("/search/users?q=abcdef&page=1&per_page=100")
-        assertThat(request.method).isEqualTo("GET")
+        assertThat(request.method).isEqualTo("GE")
     }
 
     @Test
