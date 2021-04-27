@@ -28,6 +28,9 @@ class GitHubApplication : Application() {
                 )
             )
         }
+
+
+
         Logger.addLogAdapter(AndroidLogAdapter())
     }
 }
