@@ -2,7 +2,8 @@ name: Android Build & Test Workflow
 
 on:
   pull_request:
-    branches: [ develop ]
+    branches:
+      - 'dev*'
 
 jobs:
   setup:
