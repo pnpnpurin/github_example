@@ -49,5 +49,5 @@ jobs:
           GIT_PR_RELEASE_BRANCH_STAGING: release_${{ steps.version.outputs.name }}
           GIT_PR_RELEASE_LABELS: Release
         run: |
-          gem install -N git-pr-release -v "1.4.0"
+          gem install -N git-pr-release -v "1.9.0"
           git-pr-release --no-fetch
